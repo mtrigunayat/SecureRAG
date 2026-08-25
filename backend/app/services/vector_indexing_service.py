@@ -5,6 +5,7 @@ Orchestrates embedding generation and Qdrant indexing for document chunks.
 """
 from typing import List
 from datetime import datetime
+import uuid
 from sqlalchemy.orm import Session
 from qdrant_client.models import PointStruct, Distance
 
@@ -265,8 +266,12 @@ class VectorIndexingService:
         
         points = []
         for chunk, embedding in zip(chunks, embeddings):
+            # Convert string chunk_id to UUID for Qdrant compatibility
+            # Use UUID v5 for deterministic generation from chunk_id
+            point_id = str(uuid.uuid5(uuid.NAMESPACE_OID, chunk.chunk_id))
+            
             point = PointStruct(
-                id=chunk.chunk_id,  # Deterministic ID
+                id=point_id,  # UUID string
                 vector=embedding,
                 payload={
                     # Document reference

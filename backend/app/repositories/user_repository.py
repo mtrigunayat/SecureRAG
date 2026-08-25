@@ -4,7 +4,7 @@ User repository
 Provides data access methods for User entities.
 """
 from typing import List, Optional
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 
 from app.models.user import User
@@ -29,15 +29,24 @@ class UserRepository:
     
     def get_by_id(self, user_id: int) -> Optional[User]:
         """
-        Get user by ID.
+        Get user by ID with department relationship loaded.
         
         Args:
             user_id: User ID
             
         Returns:
             User if found, None otherwise
+            
+        Note:
+            Uses joinedload to eagerly load department relationship
+            to avoid lazy loading issues when session is closed.
         """
-        return self.db.query(User).filter(User.id == user_id).first()
+        return (
+            self.db.query(User)
+            .options(joinedload(User.department))
+            .filter(User.id == user_id)
+            .first()
+        )
     
     def get_by_username(self, username: str) -> Optional[User]:
         """
@@ -53,15 +62,24 @@ class UserRepository:
     
     def get_by_email(self, email: str) -> Optional[User]:
         """
-        Get user by email.
+        Get user by email with department relationship loaded.
         
         Args:
             email: Email address
             
         Returns:
             User if found, None otherwise
+            
+        Note:
+            Uses joinedload to eagerly load department relationship
+            to avoid lazy loading issues when session is closed.
         """
-        return self.db.query(User).filter(User.email == email).first()
+        return (
+            self.db.query(User)
+            .options(joinedload(User.department))
+            .filter(User.email == email)
+            .first()
+        )
     
     def get_by_department(self, department_id: int) -> List[User]:
         """

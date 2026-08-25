@@ -285,10 +285,10 @@ class QdrantService:
             - Unauthorized chunks are NEVER retrieved
         """
         try:
-            # Search with ACL filter
-            search_result = self.client.search(
+            # Search with ACL filter using query_points
+            search_result = self.client.query_points(
                 collection_name=collection_name,
-                query_vector=query_vector,
+                query=query_vector,
                 query_filter=department_filter,  # ← SECURITY BOUNDARY
                 limit=top_k,
                 score_threshold=score_threshold
@@ -296,7 +296,7 @@ class QdrantService:
             
             # Convert to dict format
             results = []
-            for scored_point in search_result:
+            for scored_point in search_result.points:
                 results.append({
                     "id": scored_point.id,
                     "score": scored_point.score,
