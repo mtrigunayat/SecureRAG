@@ -59,12 +59,15 @@ def init_db() -> None:
     
     Creates all tables defined in models.
     Called during application startup.
+    
+    Note: In production, use Alembic migrations instead of create_all().
+    This is kept for development convenience and backward compatibility.
     """
     try:
         # Import all models here to ensure they're registered with Base
-        # from app.models import user, department, document
+        from app.models import department, user, document
         
-        # Create tables (will be implemented in future phases)
+        # Create tables (use Alembic migrations in production)
         Base.metadata.create_all(bind=engine)
         logger.info("Database tables initialized")
     except Exception as e:
