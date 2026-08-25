@@ -15,7 +15,7 @@ This is an internal company Knowledge Assistant that allows employees to query c
 - **Vector Database**: Qdrant
 - **Embeddings**: sentence-transformers/all-MiniLM-L6-v2 (local, $0 cost)
 - **Retrieval**: Qdrant vector search with department-based ACL filtering
-- **LLM**: OpenAI GPT-4.1-mini (future Phase 9)
+- **LLM**: Azure OpenAI GPT-4.1-mini (Phase 9 complete)
 - **Containerization**: Docker Compose
 
 ### Core Architecture Flow
@@ -37,11 +37,11 @@ Authorized Chunks Only ✅ Phase 8
     ↓
 Relevance Validation ✅ Phase 8
     ↓
-Secure Prompt Construction ⏳ Phase 9
+Secure Prompt Construction ✅ Phase 9
     ↓
-GPT-4.1-mini Generation ⏳ Phase 9
+Azure OpenAI GPT-4.1-mini Generation ✅ Phase 9
     ↓
-Answer + Authorized Sources ⏳ Phase 9
+Answer + Backend-Controlled Sources ✅ Phase 9
 ```
 
 ### Security Principles
@@ -56,7 +56,7 @@ Answer + Authorized Sources ⏳ Phase 9
 
 - Docker and Docker Compose
 - Python 3.11+ (for local development)
-- OpenAI API key (for embeddings and LLM)
+- Azure OpenAI API key (for LLM generation)
 
 ## Quick Start
 
@@ -71,8 +71,11 @@ cp .env.example .env
 Edit `.env` and set your configuration:
 
 ```bash
-# Required: Set your OpenAI API key
-OPENAI_API_KEY=sk-your-api-key-here
+# Required: Set your Azure OpenAI credentials (Phase 9)
+AZURE_OPENAI_API_KEY=your-azure-openai-api-key-here
+AZURE_OPENAI_ENDPOINT=https://your-resource-name.openai.azure.com/
+AZURE_OPENAI_DEPLOYMENT=gpt-4.1-mini
+AZURE_OPENAI_API_VERSION=2024-12-01-preview
 
 # Required: Set a strong JWT secret (minimum 32 characters)
 JWT_SECRET=your-secret-key-minimum-32-characters-long
@@ -80,6 +83,8 @@ JWT_SECRET=your-secret-key-minimum-32-characters-long
 # Optional: Adjust other settings as needed
 APP_ENV=development
 LOG_LEVEL=INFO
+LLM_TEMPERATURE=0.0
+LLM_MAX_TOKENS=1000
 ```
 
 ### 2. Start Services
@@ -335,10 +340,63 @@ Health check endpoint that verifies all services are running.
 }
 ```
 
+#### `POST /api/auth/login` (Phase 4)
+User authentication endpoint.
+
+**Request:**
+```json
+{
+  "username": "alice",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "access_token": "eyJ...",
+  "token_type": "bearer"
+}
+```
+
+#### `POST /api/chat` (Phase 9)
+RAG generation endpoint. Requires JWT authentication.
+
+**Request:**
+```json
+{
+  "question": "What is our deployment process?"
+}
+```
+
+**Response:**
+```json
+{
+  "answer": "The deployment process has three stages: build, test, and deploy...",
+  "sources": [
+    {
+      "document_id": 1,
+      "document_name": "Engineering Handbook",
+      "department_name": "engineering",
+      "sensitivity": "internal",
+      "page_start": 5,
+      "page_end": 6,
+      "score": 0.87
+    }
+  ],
+  "retrieved_count": 1,
+  "user_department_name": "engineering",
+  "model": "gpt-4.1-mini"
+}
+```
+
+**Headers:**
+```
+Authorization: Bearer eyJ...
+```
+
 ### Planned Endpoints (Future Phases)
 
-- `POST /api/auth/login` - User authentication
-- `POST /api/chat` - Submit question, receive answer with sources
 - `POST /api/documents/ingest` - Upload and index documents (internal only)
 
 ## Configuration
@@ -362,10 +420,18 @@ All configuration is managed through environment variables (`.env` file).
 
 ### Security Settings
 
-- `OPENAI_API_KEY`: OpenAI API key for embeddings and LLM
 - `JWT_SECRET`: Secret key for JWT signing (minimum 32 characters)
 - `JWT_ALGORITHM`: JWT signing algorithm (default: HS256)
 - `JWT_EXPIRATION_HOURS`: JWT expiration time (default: 1 hour)
+
+### LLM Settings (Phase 9)
+
+- `AZURE_OPENAI_API_KEY`: Azure OpenAI API key
+- `AZURE_OPENAI_ENDPOINT`: Azure OpenAI endpoint URL
+- `AZURE_OPENAI_DEPLOYMENT`: Azure OpenAI deployment name (default: gpt-4.1-mini)
+- `AZURE_OPENAI_API_VERSION`: Azure OpenAI API version (default: 2024-12-01-preview)
+- `LLM_TEMPERATURE`: LLM temperature (default: 0.0 for deterministic responses)
+- `LLM_MAX_TOKENS`: Maximum tokens for LLM responses (default: 1000)
 
 ### RAG Settings
 
@@ -443,6 +509,25 @@ All configuration is managed through environment variables (`.env` file).
   - No post-retrieval filtering
 - **Details:** [PHASE_8_COMPLETE.md](backend/PHASE_8_COMPLETE.md)
 
+## ✅ Phase 9: RAG Generation with Azure OpenAI — COMPLETE
+- **CRITICAL security guarantee: NO UNAUTHORIZED CONTENT REACHES LLM**
+- LLM service abstraction (provider-agnostic architecture)
+- Azure OpenAI GPT-4.1-mini integration
+- Secure prompt construction with prompt injection defense
+- Three-message architecture (system/context/question separation)
+- Hallucination prevention (empty retrieval = no LLM call)
+- Backend-controlled sources (LLM cannot invent citations)
+- POST /api/chat endpoint (question → answer + sources)
+- Configuration: Temperature 0.0, Max Tokens 1000
+- Comprehensive security tests (20 tests, all passing)
+  - Cross-department LLM isolation
+  - Prompt injection defense verification
+  - Empty retrieval handling
+  - LLM failure handling
+- **Embedding cost: $0** (local sentence-transformers)
+- **LLM cost: ~$0.0001 per query** (Azure GPT-4.1-mini)
+- **Details:** [PHASE_9_COMPLETE.md](backend/PHASE_9_COMPLETE.md)
+
 ### Pending Phases
 
 ## 🔄 Phase 4: Authentication & Authorization — PENDING
@@ -473,18 +558,19 @@ All configuration is managed through environment variables (`.env` file).
 
 ## Security Considerations
 
-### Current Phase
+### Implemented Security (Phases 1-9)
 - ✅ No secrets committed to Git
 - ✅ Environment-based configuration
 - ✅ Structured error handling (no internal details exposed)
-- ✅ Logging infrastructure (prepared for sensitive data filtering)
-
-### Future Phases
-- 🔄 JWT authentication
-- 🔄 Department-based authorization
-- 🔄 Retrieval-time ACL filtering
-- 🔄 Prompt injection protection
-- 🔄 Hallucination prevention
+- ✅ Logging infrastructure (sensitive data filtering)
+- ✅ JWT authentication with secure password hashing (bcrypt)
+- ✅ Department-based authorization (PostgreSQL-enforced)
+- ✅ Retrieval-time ACL filtering (Qdrant-level, not post-retrieval)
+- ✅ Prompt injection protection (system message defense)
+- ✅ Hallucination prevention (empty retrieval = no LLM call)
+- ✅ Backend-controlled sources (LLM cannot invent citations)
+- ✅ Error sanitization (no API keys or prompts exposed)
+- ✅ **CRITICAL**: NO UNAUTHORIZED CONTENT REACHES LLM
 
 ## License
 

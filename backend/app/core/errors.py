@@ -252,9 +252,38 @@ class EmbeddingError(AppException):
         )
 
 
-# Future error classes for later phases:
-# class RetrievalError(AppException)
-# class LLMError(AppException)
+# ============================================================
+# LLM Errors (Phase 9)
+# ============================================================
+
+class LLMError(AppException):
+    """
+    LLM generation error.
+    
+    Raised when LLM provider fails to generate a response.
+    
+    Possible causes:
+        - Azure API unavailable
+        - Authentication failure
+        - Rate limiting
+        - Timeout
+        - Malformed response
+        - Provider exception
+    
+    HTTP Status: 503 Service Unavailable
+    
+    Security:
+        - Does NOT expose provider-specific error details to client
+        - Does NOT log API keys
+        - Does NOT expose full prompts
+    """
+    
+    def __init__(self, message: str = "LLM generation failed", details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            details=details
+        )
 
 
 async def app_exception_handler(request: Request, exc: AppException) -> JSONResponse:

@@ -90,8 +90,9 @@ app.include_router(documents_router, prefix="/api")
 from app.api.retrieval import router as retrieval_router
 app.include_router(retrieval_router)
 
-# Future routers (to be added in later phases):
-# Phase 9: app.include_router(chat_router, prefix="/api/chat", tags=["chat"])
+# Phase 9: RAG Generation
+from app.api.chat import router as chat_router
+app.include_router(chat_router)
 
 
 @app.get("/")

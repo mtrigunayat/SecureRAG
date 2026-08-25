@@ -32,6 +32,14 @@ class Settings(BaseSettings):
     # OpenAI (for future LLM phases)
     openai_api_key: Optional[str] = None
     
+    # Azure OpenAI (Phase 9 - LLM Generation)
+    azure_openai_api_key: Optional[str] = None
+    azure_openai_endpoint: Optional[str] = None
+    azure_openai_deployment: str = "gpt-4.1-mini"
+    azure_openai_api_version: str = "2024-12-01-preview"
+    llm_temperature: float = 0.0  # Deterministic for enterprise RAG
+    llm_max_tokens: int = 1000  # Maximum response length
+    
     # Authentication
     jwt_secret: Optional[str] = None
     jwt_algorithm: str = "HS256"
