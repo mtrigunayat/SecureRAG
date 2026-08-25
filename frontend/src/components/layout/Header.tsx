@@ -20,7 +20,7 @@ export function Header() {
   const handleConfirmLogout = () => {
     setShowLogoutModal(false);
     logout();
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
   };
 
   const handleCancelLogout = () => {

@@ -3,7 +3,7 @@
  */
 
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { APIError } from '../../utils/api';
 import './LoginForm.css';
@@ -53,6 +53,8 @@ export function LoginForm() {
   return (
     <div className="login-container">
       <div className="login-card">
+        <Link to="/" className="back-link">← Back to Home</Link>
+        
         <h1 className="login-title">Secure RAG Assistant</h1>
         <p className="login-subtitle">Sign in to access your knowledge base</p>
 
