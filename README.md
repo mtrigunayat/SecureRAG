@@ -122,6 +122,132 @@ Open your browser to view the interactive API documentation:
 
 ## Development
 
+### Document Ingestion (Phase 6)
+
+**Important:** Phase 6 implements ONLY the ingestion pipeline (PDF → chunks). It does NOT:
+- Generate embeddings
+- Insert vectors into Qdrant
+- Implement retrieval
+- Make any LLM calls
+
+#### Ingestion Pipeline Flow
+
+```
+PDF File
+  ↓
+PDF Text Extraction (pypdf)
+  ├─ Preserve page boundaries
+  └─ Page-by-page extraction
+  ↓
+Text Cleaning (conservative)
+  ├─ Normalize line endings
+  ├─ Tabs → spaces
+  ├─ Collapse multiple blank lines
+  └─ NO AI rewriting, NO summarization
+  ↓
+Document Registration (PostgreSQL)
+  ├─ Calculate SHA-256 content hash
+  ├─ Validate department exists
+  ├─ Validate sensitivity level
+  └─ Store metadata (indexed_at=NULL)
+  ↓
+Text Chunking (RecursiveCharacterTextSplitter)
+  ├─ chunk_size: 600 characters
+  ├─ chunk_overlap: 100 characters
+  ├─ Preserve page information
+  └─ Add complete metadata
+  ↓
+Output: List[DocumentChunk]
+  ├─ chunk_id: "{document_id}_{chunk_index}"
+  ├─ document_id, document_name
+  ├─ department_id, department_name
+  ├─ sensitivity
+  ├─ page_start, page_end (1-indexed)
+  ├─ chunk_index (0-indexed)
+  └─ text (ready for embedding)
+```
+
+#### CLI Usage
+
+Ingest a PDF document (development only):
+
+```bash
+cd backend
+
+# Basic ingestion
+python -m app.ingestion.cli ingest path/to/document.pdf \
+  --name "Document Name" \
+  --department engineering \
+  --sensitivity internal
+
+# Example with test fixtures
+python -m app.ingestion.cli ingest tests/fixtures/pdfs/coding_standards.pdf \
+  --name "Coding Standards" \
+  --department engineering \
+  --sensitivity internal
+```
+
+**Supported Parameters:**
+- `--department`: Must be one of: engineering, sales, hr, general
+- `--sensitivity`: Must be one of: public, internal, confidential
+
+**Re-ingestion Behavior:**
+- Same content hash + same name → UNCHANGED_SKIP_INGESTION (no processing)
+- Different content hash + same name → Updates document, processes new chunks
+- This is deterministic - same PDF always produces same hash
+
+**Output Example:**
+```
+================================================================================
+INGESTION RESULT
+================================================================================
+Document:         Coding Standards
+Document ID:      2
+Department:       engineering
+Sensitivity:      internal
+Pages:            2
+Characters:       575
+Chunks:           1
+Content Hash:     9e00c0622908bc6ec4...
+Status:           READY_FOR_EMBEDDING
+================================================================================
+✓ Document ready for embedding (Phase 7)
+
+Sample chunks:
+
+Chunk 1:
+  ID:        2_0
+  Pages:     1-2
+  Length:    577 chars
+  Preview:   Coding Standards
+```
+
+#### Chunk Metadata Contract (Phase 6 → Phase 7)
+
+Each `DocumentChunk` contains all metadata needed for Qdrant indexing:
+
+```python
+DocumentChunk(
+    chunk_id="2_0",              # Unique ID: {document_id}_{chunk_index}
+    document_id=2,               # PostgreSQL document.id
+    document_name="Coding Standards",
+    department_id=1,             # For ACL filtering in Qdrant
+    department_name="engineering",
+    sensitivity="internal",      # For future sensitivity-based filtering
+    page_start=1,                # 1-indexed page number
+    page_end=2,                  # Inclusive
+    chunk_index=0,               # 0-indexed position in document
+    text="Coding Standards\nPage 1\n..."  # Ready for embedding
+)
+```
+
+**Phase 7 will:**
+1. Generate embedding for `chunk.text`
+2. Insert into Qdrant with:
+   - Vector: embedding
+   - Payload: all chunk metadata
+   - Filter field: `department_id` (for ACL)
+
 ### Local Development Setup
 
 For local development without Docker:
@@ -270,6 +396,18 @@ All configuration is managed through environment variables (`.env` file).
 - Database tests (models, repositories, seed)
 - PostgreSQL-Qdrant contract defined
 - **Details:** [PHASE_3_COMPLETE.md](PHASE_3_COMPLETE.md)
+
+## ✅ Phase 6: Document Ingestion Pipeline — COMPLETE
+- PDF text extraction with page preservation
+- Conservative text cleaning (normalization only, no AI rewriting)
+- Document chunking with RecursiveCharacterTextSplitter (600 chars, 100 overlap)
+- Complete metadata enrichment (department, sensitivity, page ranges)
+- Deterministic content hashing for duplicate detection
+- Re-ingestion handling (unchanged content skipped)
+- CLI tool for development ingestion
+- 52 comprehensive tests (extraction, cleaning, chunking, full pipeline)
+- **Status:** Documents ready for Phase 7 embedding
+- **Output:** DocumentChunk schema with complete metadata for Qdrant indexing
 
 ### Pending Phases
 

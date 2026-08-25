@@ -141,6 +141,96 @@ class NotFoundError(AppException):
         )
 
 
+# ============================================================
+# Ingestion Errors (Phase 6)
+# ============================================================
+
+class IngestionError(AppException):
+    """
+    Base class for document ingestion errors.
+    
+    Ingestion errors occur during document processing:
+    file validation, text extraction, chunking, etc.
+    
+    HTTP Status: 400 Bad Request (user-correctable errors)
+                 or 422 Unprocessable Entity (validation errors)
+    """
+    def __init__(self, message: str = "Document ingestion failed", details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details=details or {}
+        )
+
+
+class UnsupportedFileError(IngestionError):
+    """Unsupported file type error."""
+    
+    def __init__(self, file_type: Optional[str] = None):
+        message = f"Unsupported file type: {file_type}" if file_type else "Unsupported file type"
+        super().__init__(
+            message=message,
+            details={"supported_types": ["pdf"]}
+        )
+
+
+class InvalidPDFError(IngestionError):
+    """Invalid or corrupt PDF file."""
+    
+    def __init__(self, reason: Optional[str] = None):
+        message = f"Invalid PDF file: {reason}" if reason else "Invalid PDF file"
+        super().__init__(message=message)
+
+
+class EmptyDocumentError(IngestionError):
+    """Document contains no extractable text."""
+    
+    def __init__(self):
+        super().__init__(
+            message="Document contains no extractable text. OCR is not currently supported.",
+            details={"ocr_supported": False}
+        )
+
+
+class TextExtractionError(IngestionError):
+    """Text extraction from document failed."""
+    
+    def __init__(self, reason: Optional[str] = None):
+        message = f"Text extraction failed: {reason}" if reason else "Text extraction failed"
+        super().__init__(message=message)
+
+
+class ChunkingError(IngestionError):
+    """Document chunking failed."""
+    
+    def __init__(self, reason: Optional[str] = None):
+        message = f"Chunking failed: {reason}" if reason else "Chunking failed"
+        super().__init__(message=message)
+
+
+class DepartmentNotFoundError(IngestionError):
+    """Department does not exist in database."""
+    
+    def __init__(self, department_name: str):
+        super().__init__(
+            message=f"Department '{department_name}' does not exist",
+            details={"department_name": department_name}
+        )
+
+
+class InvalidSensitivityError(IngestionError):
+    """Invalid document sensitivity level."""
+    
+    def __init__(self, sensitivity: str):
+        super().__init__(
+            message=f"Invalid sensitivity level: {sensitivity}",
+            details={
+                "provided": sensitivity,
+                "valid_values": ["public", "internal", "confidential"]
+            }
+        )
+
+
 # Future error classes for later phases:
 # class ValidationError(AppException)
 # class RetrievalError(AppException)

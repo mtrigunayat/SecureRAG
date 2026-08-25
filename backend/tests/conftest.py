@@ -71,6 +71,29 @@ def db_session(test_db):
 
 
 @pytest.fixture(scope="function")
+def test_db_with_departments(test_db):
+    """
+    Test database session with departments seeded.
+    Use this fixture for ingestion tests that require departments.
+    
+    Yields:
+        Test database session with departments
+    """
+    from app.models.department import Department
+    
+    # Seed departments
+    engineering = Department(id=1, name="engineering", description="Engineering and development team")
+    sales = Department(id=2, name="sales", description="Sales and business development team")
+    hr = Department(id=3, name="hr", description="Human resources team")
+    general = Department(id=4, name="general", description="General company documents")
+    
+    test_db.add_all([engineering, sales, hr, general])
+    test_db.commit()
+    
+    yield test_db
+
+
+@pytest.fixture(scope="function")
 def client(test_db):
     """
     Create a test client with database override and seeded data.

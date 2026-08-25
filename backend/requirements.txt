@@ -27,3 +27,8 @@ httpx==0.26.0
 
 # Utilities
 python-dotenv==1.0.0
+
+# Document Processing (Phase 6)
+pypdf==4.0.1
+langchain-text-splitters==0.0.1
+reportlab==4.0.9  # For test PDF generation
