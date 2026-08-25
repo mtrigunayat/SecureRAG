@@ -16,7 +16,16 @@ export interface AuthError {
   detail: string;
 }
 
+export interface Department {
+  id: number;
+  name: string;
+  description: string | null;
+}
+
 export interface User {
+  id: number;
+  username: string;
   email: string;
-  // Add other user fields as needed from backend
+  full_name: string;
+  department: Department;
 }

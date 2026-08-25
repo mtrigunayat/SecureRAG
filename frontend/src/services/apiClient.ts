@@ -6,6 +6,7 @@
  */
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const TOKEN_KEY = 'auth_token';
 
 export interface RequestOptions extends RequestInit {
   token?: string;
@@ -27,8 +28,10 @@ async function request<T>(
     Object.assign(headers, existingHeaders);
   }
 
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
+  // Use provided token or get from localStorage
+  const authToken = token || localStorage.getItem(TOKEN_KEY);
+  if (authToken) {
+    headers['Authorization'] = `Bearer ${authToken}`;
   }
 
   const response = await fetch(`${API_URL}${endpoint}`, {
