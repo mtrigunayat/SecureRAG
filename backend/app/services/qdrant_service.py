@@ -231,10 +231,89 @@ class QdrantService:
             logger.error(f"Failed to get collection info: {e}")
             raise VectorDBError(f"Failed to get collection info: {e}")
     
-    # Phase 8 will add:
-    # - search_with_filter() for similarity search with ACL filtering
-    # - get_point() for retrieving specific vectors
-    # - scroll() for pagination
+    def search(
+        self,
+        collection_name: str,
+        query_vector: List[float],
+        department_filter: Filter,
+        top_k: int,
+        score_threshold: Optional[float] = None
+    ) -> List[Dict[str, Any]]:
+        """
+        Search vectors with ACL filtering.
+        
+        SECURITY CRITICAL: This method implements retrieval-time ACL filtering.
+        The department_filter MUST be applied during the Qdrant search operation,
+        NOT after retrieving results.
+        
+        Process:
+            1. Qdrant searches for similar vectors
+            2. AND applies department_filter DURING search
+            3. Returns only authorized results
+        
+        Args:
+            collection_name: Name of the collection to search
+            query_vector: Query embedding vector (384-dim for all-MiniLM-L6-v2)
+            department_filter: Filter restricting results to user's department
+            top_k: Maximum number of results to return
+            score_threshold: Optional minimum similarity score
+            
+        Returns:
+            List of search results with payload and score:
+            [
+                {
+                    "id": "doc1_chunk0",
+                    "score": 0.85,
+                    "payload": {
+                        "document_id": 1,
+                        "chunk_id": "doc1_chunk0",
+                        "document_name": "...",
+                        "department_id": 10,
+                        "chunk_text": "...",
+                        ...
+                    }
+                },
+                ...
+            ]
+            
+        Raises:
+            VectorDBError: If search fails
+            
+        Security:
+            - ACL filter is mandatory and applied during search
+            - Client cannot bypass department restriction
+            - Unauthorized chunks are NEVER retrieved
+        """
+        try:
+            # Search with ACL filter
+            search_result = self.client.search(
+                collection_name=collection_name,
+                query_vector=query_vector,
+                query_filter=department_filter,  # ← SECURITY BOUNDARY
+                limit=top_k,
+                score_threshold=score_threshold
+            )
+            
+            # Convert to dict format
+            results = []
+            for scored_point in search_result:
+                results.append({
+                    "id": scored_point.id,
+                    "score": scored_point.score,
+                    "payload": scored_point.payload
+                })
+            
+            logger.info(
+                f"Search completed: collection={collection_name}, "
+                f"top_k={top_k}, threshold={score_threshold}, "
+                f"results={len(results)}"
+            )
+            
+            return results
+            
+        except Exception as e:
+            logger.error(f"Vector search failed: {e}")
+            raise VectorDBError(f"Vector search failed: {e}")
 
 
 # Global Qdrant service instance

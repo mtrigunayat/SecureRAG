@@ -13,8 +13,9 @@ This is an internal company Knowledge Assistant that allows employees to query c
 - **Backend**: Python 3.11 + FastAPI
 - **Database**: PostgreSQL 15
 - **Vector Database**: Qdrant
-- **LLM**: OpenAI GPT-4.1-mini (future phase)
 - **Embeddings**: sentence-transformers/all-MiniLM-L6-v2 (local, $0 cost)
+- **Retrieval**: Qdrant vector search with department-based ACL filtering
+- **LLM**: OpenAI GPT-4.1-mini (future Phase 9)
 - **Containerization**: Docker Compose
 
 ### Core Architecture Flow
@@ -24,23 +25,23 @@ User Question
     ↓
 FastAPI Backend
     ↓
-Authentication (JWT)
+Authentication (JWT) ✅ Phase 4
     ↓
-Authorization (Department-based)
+Authorization (Department-based) ✅ Phase 5
     ↓
-Query Embedding (OpenAI)
+Query Embedding (Local sentence-transformers) ✅ Phase 8
     ↓
-Qdrant Vector Search + ACL Filter
+Qdrant Vector Search + ACL Filter ✅ Phase 8
     ↓
-Authorized Chunks Only
+Authorized Chunks Only ✅ Phase 8
     ↓
-Relevance Validation
+Relevance Validation ✅ Phase 8
     ↓
-Secure Prompt Construction
+Secure Prompt Construction ⏳ Phase 9
     ↓
-GPT-4.1-mini Generation
+GPT-4.1-mini Generation ⏳ Phase 9
     ↓
-Answer + Authorized Sources
+Answer + Authorized Sources ⏳ Phase 9
 ```
 
 ### Security Principles
@@ -423,6 +424,24 @@ All configuration is managed through environment variables (`.env` file).
 - Comprehensive tests (embedding service, indexing service)
 - **Embedding API cost: $0**
 - **Details:** [PHASE_7_COMPLETE.md](PHASE_7_COMPLETE.md)
+
+## ✅ Phase 8: Secure Vector Retrieval with ACL Filtering — COMPLETE
+- **CRITICAL security guarantee: Users can NEVER retrieve documents from unauthorized departments**
+- Retrieval-time ACL filtering inside Qdrant (NOT post-retrieval)
+- Department resolution from PostgreSQL (never from client)
+- Same embedding model as indexing (sentence-transformers/all-MiniLM-L6-v2)
+- **Embedding cost: $0** (local execution)
+- RetrievalService orchestrator with secure department resolution
+- QdrantService.search() method with ACL filtering
+- POST /api/retrieval endpoint (question → authorized chunks)
+- Top-K configuration (5 chunks)
+- Relevance threshold (0.7 cosine similarity)
+- Comprehensive security tests (23 tests, all passing)
+  - Cross-department isolation tests
+  - Client cannot bypass ACL
+  - Filter presence verification
+  - No post-retrieval filtering
+- **Details:** [PHASE_8_COMPLETE.md](backend/PHASE_8_COMPLETE.md)
 
 ### Pending Phases
 

@@ -86,8 +86,12 @@ app.include_router(auth_router)
 from app.api.documents import router as documents_router
 app.include_router(documents_router, prefix="/api")
 
+# Phase 8: Retrieval
+from app.api.retrieval import router as retrieval_router
+app.include_router(retrieval_router)
+
 # Future routers (to be added in later phases):
-# app.include_router(chat_router, prefix="/api/chat", tags=["chat"])
+# Phase 9: app.include_router(chat_router, prefix="/api/chat", tags=["chat"])
 
 
 @app.get("/")

@@ -37,10 +37,13 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiration_hours: int = 1
     
-    # RAG Configuration
+    # RAG Configuration (Phase 6)
     chunk_size: int = 600
     chunk_overlap: int = 100
-    relevance_threshold: float = 0.7
+    
+    # Retrieval Configuration (Phase 8)
+    retrieval_top_k: int = 5  # Maximum number of chunks to retrieve
+    retrieval_score_threshold: float = 0.7  # Minimum similarity score (cosine)
     
     model_config = SettingsConfigDict(
         env_file=".env",
