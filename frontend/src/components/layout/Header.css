@@ -1,0 +1,55 @@
+.app-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.logout-button {
+  padding: 0.5rem 1.25rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+
+.logout-button:hover {
+  background: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.logout-button:active {
+  transform: scale(0.98);
+}
+
+@media (max-width: 640px) {
+  .header-title {
+    font-size: 1.25rem;
+  }
+
+  .logout-button {
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+  }
+}

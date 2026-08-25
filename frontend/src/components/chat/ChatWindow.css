@@ -1,0 +1,36 @@
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 64px); /* Full height minus header */
+  background: white;
+}
+
+.chat-error {
+  background: #fed7d7;
+  color: #9b2c2c;
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #fc8181;
+}
+
+.chat-error button {
+  background: none;
+  border: none;
+  color: #9b2c2c;
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.chat-error button:hover {
+  background: rgba(155, 44, 44, 0.1);
+}
