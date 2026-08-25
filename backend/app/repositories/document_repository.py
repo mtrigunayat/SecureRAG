@@ -5,11 +5,14 @@ Provides data access methods for Document entities.
 """
 from typing import List, Optional
 from datetime import datetime
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 
 from app.models.document import Document, DocumentSensitivity
 from app.core.errors import DatabaseError
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class DocumentRepository:
@@ -17,6 +20,7 @@ class DocumentRepository:
     Repository for Document entity database operations.
     
     Encapsulates database access logic for documents.
+    Handles CRUD operations and department-scoped queries.
     """
     
     def __init__(self, db: Session):
@@ -27,6 +31,61 @@ class DocumentRepository:
             db: SQLAlchemy database session
         """
         self.db = db
+    
+    def get_by_id(self, document_id: int) -> Optional[Document]:
+        """
+        Get document by ID with department relationship loaded.
+        
+        Args:
+            document_id: Document ID
+            
+        Returns:
+            Document object or None if not found
+            
+        Note:
+            Uses joinedload to eagerly load department relationship
+            for authorization checks.
+        """
+        return (
+            self.db.query(Document)
+            .options(joinedload(Document.department))
+            .filter(Document.id == document_id)
+            .first()
+        )
+    
+    def get_all(self) -> List[Document]:
+        """
+        Get all documents with department relationships loaded.
+        
+        Returns:
+            List of all documents
+        """
+        return (
+            self.db.query(Document)
+            .options(joinedload(Document.department))
+            .all()
+        )
+    
+    def get_by_department(self, department_id: int) -> List[Document]:
+        """
+        Get all documents for a specific department.
+        
+        Args:
+            department_id: Department ID
+            
+        Returns:
+            List of documents in the department
+            
+        Usage:
+            Can be used to list all documents a user can access
+            based on their department.
+        """
+        return (
+            self.db.query(Document)
+            .options(joinedload(Document.department))
+            .filter(Document.department_id == department_id)
+            .all()
+        )
     
     def get_by_id(self, document_id: int) -> Optional[Document]:
         """

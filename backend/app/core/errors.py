@@ -86,8 +86,62 @@ class ExpiredTokenError(AuthenticationError):
         )
 
 
+# ============================================================
+# Authorization Errors (Phase 5)
+# ============================================================
+
+class AuthorizationError(AppException):
+    """
+    Base class for authorization errors.
+    
+    Authorization errors occur when an authenticated user
+    attempts to access a resource they do not have permission for.
+    
+    HTTP Status: 403 Forbidden
+    
+    Distinction:
+        - 401 Unauthorized: User is NOT authenticated
+        - 403 Forbidden: User IS authenticated but lacks permission
+    """
+    
+    def __init__(self, message: str = "Access denied", details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_403_FORBIDDEN,
+            details=details or {}
+        )
+
+
+class ForbiddenError(AuthorizationError):
+    """
+    Raised when an authenticated user does not have permission
+    to access a resource.
+    
+    This is the primary authorization error.
+    Use generic messages to avoid leaking information about
+    resources the user should not know about.
+    """
+    
+    def __init__(self, message: str = "You do not have permission to access this resource"):
+        super().__init__(message, details={})
+
+
+# ============================================================
+# Resource Errors
+# ============================================================
+
+class NotFoundError(AppException):
+    """Raised when a requested resource is not found."""
+    
+    def __init__(self, message: str = "Resource not found"):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_404_NOT_FOUND,
+            details={}
+        )
+
+
 # Future error classes for later phases:
-# class AuthorizationError(AppException)
 # class ValidationError(AppException)
 # class RetrievalError(AppException)
 # class LLMError(AppException)

@@ -60,9 +60,20 @@ def test_db():
 
 
 @pytest.fixture(scope="function")
+def db_session(test_db):
+    """
+    Alias for test_db fixture (for clarity in unit tests).
+    
+    Yields:
+        Test database session
+    """
+    yield test_db
+
+
+@pytest.fixture(scope="function")
 def client(test_db):
     """
-    Create a test client with database override.
+    Create a test client with database override and seeded data.
     
     Args:
         test_db: Test database session fixture
@@ -71,6 +82,77 @@ def client(test_db):
         FastAPI test client
     """
     from app.db.session import get_db
+    from app.models.department import Department
+    from app.models.user import User
+    from app.models.document import Document
+    from app.services.password_service import hash_password
+    
+    # Seed test database with departments, users, and documents
+    # This matches the production seed data
+    
+    # Create departments
+    engineering = Department(id=1, name="engineering", description="Engineering and development team")
+    sales = Department(id=2, name="sales", description="Sales and business development team")
+    hr = Department(id=3, name="hr", description="Human resources team")
+    general = Department(id=4, name="general", description="General company documents")
+    
+    test_db.add_all([engineering, sales, hr, general])
+    test_db.flush()
+    
+    # Create users (alice, bob, charlie)
+    dev_password = "password123"  # POC ONLY
+    dev_password_hash = hash_password(dev_password)
+    
+    alice = User(
+        id=2,  # Match production seed (user id=1 might be reserved)
+        username="alice",
+        email="alice@company.com",
+        full_name="Alice Johnson",
+        password_hash=dev_password_hash,
+        department_id=engineering.id
+    )
+    bob = User(
+        id=3,
+        username="bob",
+        email="bob@company.com",
+        full_name="Bob Smith",
+        password_hash=dev_password_hash,
+        department_id=sales.id
+    )
+    charlie = User(
+        id=4,
+        username="charlie",
+        email="charlie@company.com",
+        full_name="Charlie Brown",
+        password_hash=dev_password_hash,
+        department_id=hr.id
+    )
+    
+    test_db.add_all([alice, bob, charlie])
+    test_db.flush()
+    
+    # Create documents
+    # Engineering docs (1-3)
+    test_db.add(Document(id=1, name="Deployment Guidelines", department_id=engineering.id))
+    test_db.add(Document(id=2, name="Coding Standards", department_id=engineering.id))
+    test_db.add(Document(id=3, name="Architecture Guide", department_id=engineering.id))
+    
+    # Sales docs (4-6)
+    test_db.add(Document(id=4, name="Pricing Policy", department_id=sales.id))
+    test_db.add(Document(id=5, name="Discount Policy", department_id=sales.id))
+    test_db.add(Document(id=6, name="Sales Playbook", department_id=sales.id))
+    
+    # HR docs (7-9)
+    test_db.add(Document(id=7, name="Leave Policy", department_id=hr.id))
+    test_db.add(Document(id=8, name="Employee Benefits", department_id=hr.id))
+    test_db.add(Document(id=9, name="Performance Review Guidelines", department_id=hr.id))
+    
+    # General docs (10-12)
+    test_db.add(Document(id=10, name="Company Overview", department_id=general.id))
+    test_db.add(Document(id=11, name="Security Policy", department_id=general.id))
+    test_db.add(Document(id=12, name="Code of Conduct", department_id=general.id))
+    
+    test_db.commit()
     
     def override_get_db():
         try:

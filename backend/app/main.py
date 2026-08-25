@@ -82,9 +82,12 @@ app.include_router(health_router, prefix="/api", tags=["health"])
 from app.api.auth import router as auth_router
 app.include_router(auth_router)
 
+# Phase 5: Authorization (test endpoints)
+from app.api.documents import router as documents_router
+app.include_router(documents_router, prefix="/api")
+
 # Future routers (to be added in later phases):
 # app.include_router(chat_router, prefix="/api/chat", tags=["chat"])
-# app.include_router(documents_router, prefix="/api/documents", tags=["documents"])
 
 
 @app.get("/")
