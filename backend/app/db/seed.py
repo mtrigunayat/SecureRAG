@@ -2,6 +2,13 @@
 Database seed script
 
 Creates initial departments, users, and documents for development and testing.
+
+DEVELOPMENT CREDENTIALS (POC ONLY):
+- alice@company.com / password123
+- bob@company.com / password123
+- charlie@company.com / password123
+
+WARNING: These are development-only credentials. Never use in production.
 """
 from sqlalchemy.orm import Session
 
@@ -9,6 +16,7 @@ from app.db.session import SessionLocal
 from app.models.department import Department
 from app.models.user import User
 from app.models.document import Document, DocumentSensitivity
+from app.services.password_service import hash_password
 from app.core.logging import get_logger
 
 logger = get_logger(__name__)
@@ -47,38 +55,44 @@ def seed_departments(db: Session) -> dict:
 
 def seed_users(db: Session, departments: dict) -> dict:
     """
-    Seed users.
+    Seed users with development credentials.
     
     Args:
         departments: Dictionary of department objects
         
     Returns:
         Dictionary mapping usernames to User objects
+        
+    Development Credentials (POC ONLY):
+        - alice@company.com / password123
+        - bob@company.com / password123
+        - charlie@company.com / password123
     """
+    # Development password (POC ONLY - never use in production)
+    dev_password = "password123"
+    dev_password_hash = hash_password(dev_password)
+    
     users_data = [
         {
-            "username": "deepak",
-            "email": "deepak@aithinkers.com",
-            "full_name": "Deepak Kumar",
+            "username": "alice",
+            "email": "alice@company.com",
+            "full_name": "Alice Johnson",
+            "password_hash": dev_password_hash,
             "department_id": departments["engineering"].id
         },
         {
-            "username": "mohit",
-            "email": "mohit@aithinkers.com",
-            "full_name": "Mohit Trigunayat",
-            "department_id": departments["engineering"].id
-        },
-        {
-            "username": "swathi",
-            "email": "swathi@aithinkers.com",
-            "full_name": "Swathi Sharma",
-            "department_id": departments["hr"].id
-        },
-        {
-            "username": "karthik",
-            "email": "karthik@aithinkers.com",
-            "full_name": "Karthik Reddy",
+            "username": "bob",
+            "email": "bob@company.com",
+            "full_name": "Bob Smith",
+            "password_hash": dev_password_hash,
             "department_id": departments["sales"].id
+        },
+        {
+            "username": "charlie",
+            "email": "charlie@company.com",
+            "full_name": "Charlie Williams",
+            "password_hash": dev_password_hash,
+            "department_id": departments["hr"].id
         },
     ]
     
@@ -87,7 +101,12 @@ def seed_users(db: Session, departments: dict) -> dict:
         # Check if user already exists
         existing = db.query(User).filter(User.username == user_data["username"]).first()
         if existing:
-            logger.info(f"User '{user_data['username']}' already exists, skipping")
+            logger.info(f"User '{user_data['username']}' already exists, updating password")
+            # Update existing user's password hash
+            existing.password_hash = user_data["password_hash"]
+            existing.email = user_data["email"]
+            existing.full_name = user_data["full_name"]
+            existing.department_id = user_data["department_id"]
             users[user_data["username"]] = existing
         else:
             user = User(**user_data)

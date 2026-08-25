@@ -78,8 +78,11 @@ app.add_exception_handler(Exception, generic_exception_handler)
 # Register routers
 app.include_router(health_router, prefix="/api", tags=["health"])
 
+# Phase 4: Authentication
+from app.api.auth import router as auth_router
+app.include_router(auth_router)
+
 # Future routers (to be added in later phases):
-# app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 # app.include_router(chat_router, prefix="/api/chat", tags=["chat"])
 # app.include_router(documents_router, prefix="/api/documents", tags=["documents"])
 

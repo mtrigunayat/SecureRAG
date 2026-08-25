@@ -42,9 +42,17 @@ def get_db() -> Generator[Session, None, None]:
         def get_users(db: Session = Depends(get_db)):
             return db.query(User).all()
     """
+    from app.core.errors import AuthenticationError
+    from fastapi.exceptions import RequestValidationError
+    from pydantic import ValidationError
+    
     db = SessionLocal()
     try:
         yield db
+    except (AuthenticationError, RequestValidationError, ValidationError):
+        # Re-raise authentication and validation errors without converting to 503
+        db.rollback()
+        raise
     except Exception as e:
         logger.error(f"Database session error: {e}")
         db.rollback()

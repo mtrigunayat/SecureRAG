@@ -15,7 +15,7 @@ class User(Base):
     User entity.
     
     Represents an employee who can:
-    - Authenticate to the system (future phase)
+    - Authenticate to the system
     - Query documents
     - Access documents based on department membership
     
@@ -24,14 +24,16 @@ class User(Base):
         username: Unique username
         email: Unique email address
         full_name: User's full name
+        password_hash: Hashed password (bcrypt)
         department_id: Foreign key to department
         created_at: Creation timestamp
         updated_at: Last update timestamp
         department: Relationship to Department entity
     
-    Note:
-        Password/authentication fields will be added in Phase 4.
-        Currently modeling identity and department membership only.
+    Security:
+        - password_hash is never exposed via API
+        - Passwords are hashed using bcrypt
+        - Department membership loaded from PostgreSQL (trusted source)
     """
     
     __tablename__ = "users"
@@ -43,6 +45,9 @@ class User(Base):
     username = Column(String(100), unique=True, nullable=False, index=True)
     email = Column(String(255), unique=True, nullable=False, index=True)
     full_name = Column(String(255), nullable=False)
+    
+    # Authentication (Phase 4)
+    password_hash = Column(String(255), nullable=False)
     
     # Department membership (defines authorization scope)
     department_id = Column(Integer, ForeignKey("departments.id"), nullable=False, index=True)

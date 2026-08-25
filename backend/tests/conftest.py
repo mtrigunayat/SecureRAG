@@ -8,7 +8,13 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
 from app.main import app
-from app.db.session import Base, get_db
+from app.db.session import Base
+
+
+def get_db_dependency():
+    """Import get_db from correct location"""
+    from app.db.session import get_db
+    return get_db
 
 
 # Test database URL (use in-memory SQLite for tests)
@@ -64,6 +70,8 @@ def client(test_db):
     Yields:
         FastAPI test client
     """
+    from app.db.session import get_db
+    
     def override_get_db():
         try:
             yield test_db

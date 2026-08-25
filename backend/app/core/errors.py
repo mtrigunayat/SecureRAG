@@ -45,8 +45,48 @@ class VectorDBError(AppException):
         )
 
 
+class AuthenticationError(AppException):
+    """Authentication failed error."""
+    
+    def __init__(self, message: str = "Authentication failed", details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            details=details
+        )
+
+
+class InvalidCredentialsError(AuthenticationError):
+    """Invalid credentials error (generic message for security)."""
+    
+    def __init__(self):
+        super().__init__(
+            message="Invalid credentials",
+            details={}
+        )
+
+
+class InvalidTokenError(AuthenticationError):
+    """Invalid or malformed JWT token."""
+    
+    def __init__(self, message: str = "Invalid token"):
+        super().__init__(
+            message=message,
+            details={}
+        )
+
+
+class ExpiredTokenError(AuthenticationError):
+    """Expired JWT token."""
+    
+    def __init__(self):
+        super().__init__(
+            message="Token has expired",
+            details={}
+        )
+
+
 # Future error classes for later phases:
-# class AuthenticationError(AppException)
 # class AuthorizationError(AppException)
 # class ValidationError(AppException)
 # class RetrievalError(AppException)
@@ -64,12 +104,10 @@ async def app_exception_handler(request: Request, exc: AppException) -> JSONResp
     Returns:
         JSON error response
     """
+    # Use FastAPI standard format: {"detail": "message"}
     return JSONResponse(
         status_code=exc.status_code,
-        content={
-            "error": exc.message,
-            "details": exc.details
-        }
+        content={"detail": exc.message}
     )
 
 
