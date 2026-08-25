@@ -2,7 +2,18 @@
   display: flex;
   flex-direction: column;
   height: calc(100vh - 64px); /* Full height minus header */
-  background: white;
+  background: linear-gradient(to bottom, #ffffff 0%, #f7fafc 100%);
+  position: relative;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .chat-error {

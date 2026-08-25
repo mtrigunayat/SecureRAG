@@ -1,9 +1,22 @@
 .source-list {
   margin-top: 1rem;
   padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
+  background: linear-gradient(135deg, #ffffff 0%, #f7fafc 100%);
+  border-radius: 12px;
+  border: 2px solid #e2e8f0;
+  animation: fadeInScale 0.5s ease-out 0.2s backwards;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .source-header {
@@ -22,10 +35,65 @@
 }
 
 .source-item {
-  padding: 0.75rem;
-  background: #f7fafc;
-  border-radius: 6px;
-  border-left: 3px solid #667eea;
+  padding: 0.875rem;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  animation: slideInSource 0.4s ease-out backwards;
+}
+
+.source-item:nth-child(1) {
+  animation-delay: 0.3s;
+}
+
+.source-item:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.source-item:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes slideInSource {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.source-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  background: linear-gradient(90deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  transition: width 0.4s ease;
+  z-index: 0;
+}
+
+.source-item:hover::before {
+  width: 100%;
+}
+
+.source-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.15);
+  border-left-color: #764ba2;
+}
+
+.source-item > * {
+  position: relative;
+  z-index: 1;
 }
 
 .source-title {
@@ -39,6 +107,9 @@
   font-weight: 700;
   color: #667eea;
   font-size: 0.875rem;
+  padding: 0.25rem 0.5rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+  border-radius: 6px;
 }
 
 .source-name {
