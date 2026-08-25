@@ -21,16 +21,23 @@ class Settings(BaseSettings):
     
     # Vector Database
     qdrant_url: str = "http://localhost:6333"
+    qdrant_collection_name: str = "knowledge_chunks"
     
-    # OpenAI (for future phases)
+    # Embeddings (Phase 7 - Local)
+    embedding_provider: str = "local"  # local, openai (future), azure (future)
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dimension: int = 384  # all-MiniLM-L6-v2 produces 384-dim vectors
+    embedding_batch_size: int = 32  # Batch size for local embedding generation
+    
+    # OpenAI (for future LLM phases)
     openai_api_key: Optional[str] = None
     
-    # Authentication (for future phases)
+    # Authentication
     jwt_secret: Optional[str] = None
     jwt_algorithm: str = "HS256"
     jwt_expiration_hours: int = 1
     
-    # RAG Configuration (for future phases)
+    # RAG Configuration
     chunk_size: int = 600
     chunk_overlap: int = 100
     relevance_threshold: float = 0.7

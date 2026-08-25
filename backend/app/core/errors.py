@@ -231,8 +231,28 @@ class InvalidSensitivityError(IngestionError):
         )
 
 
+# ============================================================
+# Embedding Errors (Phase 7)
+# ============================================================
+
+class EmbeddingError(AppException):
+    """
+    Embedding generation error.
+    
+    Raised when embedding model fails to load or generate embeddings.
+    
+    HTTP Status: 500 Internal Server Error
+    """
+    
+    def __init__(self, message: str = "Embedding generation failed", details: Optional[Dict[str, Any]] = None):
+        super().__init__(
+            message=message,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            details=details
+        )
+
+
 # Future error classes for later phases:
-# class ValidationError(AppException)
 # class RetrievalError(AppException)
 # class LLMError(AppException)
 

@@ -13,8 +13,8 @@ This is an internal company Knowledge Assistant that allows employees to query c
 - **Backend**: Python 3.11 + FastAPI
 - **Database**: PostgreSQL 15
 - **Vector Database**: Qdrant
-- **LLM**: OpenAI GPT-4.1-mini
-- **Embeddings**: OpenAI text-embedding-3-small
+- **LLM**: OpenAI GPT-4.1-mini (future phase)
+- **Embeddings**: sentence-transformers/all-MiniLM-L6-v2 (local, $0 cost)
 - **Containerization**: Docker Compose
 
 ### Core Architecture Flow
@@ -408,6 +408,21 @@ All configuration is managed through environment variables (`.env` file).
 - 52 comprehensive tests (extraction, cleaning, chunking, full pipeline)
 - **Status:** Documents ready for Phase 7 embedding
 - **Output:** DocumentChunk schema with complete metadata for Qdrant indexing
+
+## ✅ Phase 7: Vector Embeddings and Indexing — COMPLETE
+- **Local embedding generation using sentence-transformers/all-MiniLM-L6-v2**
+- **Zero-cost embeddings: NO external API calls, NO API keys required**
+- 384-dimensional vectors with Cosine distance
+- Qdrant collection creation and management (knowledge_chunks)
+- Idempotent vector indexing (upsert semantics)
+- Clean re-indexing (old vectors deleted first)
+- ACL foundation (department_id in every vector payload)
+- VectorIndexingService orchestrator
+- EmbeddingService abstraction (supports multiple providers)
+- CLI tool extended with `index` and `ingest-and-index` commands
+- Comprehensive tests (embedding service, indexing service)
+- **Embedding API cost: $0**
+- **Details:** [PHASE_7_COMPLETE.md](PHASE_7_COMPLETE.md)
 
 ### Pending Phases
 

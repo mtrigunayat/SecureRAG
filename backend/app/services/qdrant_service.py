@@ -1,9 +1,17 @@
 """
 Qdrant vector database service
 """
-from typing import Optional
+from typing import List, Optional, Dict, Any
 from qdrant_client import QdrantClient
-from qdrant_client.http.exceptions import ResponseHandlingException
+from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse
+from qdrant_client.models import (
+    Distance,
+    VectorParams,
+    PointStruct,
+    Filter,
+    FieldCondition,
+    MatchValue
+)
 
 from app.core.config import settings
 from app.core.errors import VectorDBError
@@ -16,8 +24,11 @@ class QdrantService:
     """
     Service for interacting with Qdrant vector database.
     
-    This service provides a clean abstraction for vector operations.
-    Actual vector search and ACL filtering will be implemented in later phases.
+    This service provides vector storage and retrieval operations
+    with ACL filtering support.
+    
+    Phase 7: Collection management, vector indexing
+    Phase 8: Similarity search with department ACL filtering
     """
     
     def __init__(self):
@@ -47,11 +58,183 @@ class QdrantService:
             logger.error(f"Qdrant health check failed: {e}")
             return False
     
-    # Future methods for later phases:
-    # - create_collection()
-    # - insert_vectors()
-    # - search_with_filter()
-    # - delete_by_filter()
+    def ensure_collection(
+        self,
+        collection_name: str,
+        vector_size: int,
+        distance: Distance = Distance.COSINE
+    ) -> None:
+        """
+        Ensure collection exists with correct configuration.
+        
+        If collection doesn't exist, creates it.
+        If it exists, verifies configuration matches.
+        
+        Args:
+            collection_name: Name of the collection
+            vector_size: Vector dimension (384 for all-MiniLM-L6-v2)
+            distance: Distance metric (COSINE for semantic similarity)
+            
+        Raises:
+            VectorDBError: If collection creation fails or config mismatch
+        """
+        try:
+            # Check if collection exists
+            collections = self.client.get_collections()
+            collection_names = [c.name for c in collections.collections]
+            
+            if collection_name in collection_names:
+                # Verify configuration
+                collection_info = self.client.get_collection(collection_name)
+                
+                existing_size = collection_info.config.params.vectors.size
+                existing_distance = collection_info.config.params.vectors.distance
+                
+                if existing_size != vector_size:
+                    raise VectorDBError(
+                        f"Collection '{collection_name}' exists with "
+                        f"vector_size={existing_size}, expected {vector_size}"
+                    )
+                
+                if existing_distance != distance:
+                    raise VectorDBError(
+                        f"Collection '{collection_name}' exists with "
+                        f"distance={existing_distance}, expected {distance}"
+                    )
+                
+                logger.info(
+                    f"Collection '{collection_name}' exists with correct config: "
+                    f"size={vector_size}, distance={distance}"
+                )
+            else:
+                # Create collection
+                self.client.create_collection(
+                    collection_name=collection_name,
+                    vectors_config=VectorParams(
+                        size=vector_size,
+                        distance=distance
+                    )
+                )
+                logger.info(
+                    f"Created collection '{collection_name}': "
+                    f"size={vector_size}, distance={distance}"
+                )
+                
+        except VectorDBError:
+            raise
+        except Exception as e:
+            logger.error(f"Failed to ensure collection '{collection_name}': {e}")
+            raise VectorDBError(
+                f"Failed to ensure collection '{collection_name}': {e}"
+            )
+    
+    def upsert_points(
+        self,
+        collection_name: str,
+        points: List[PointStruct]
+    ) -> None:
+        """
+        Upsert points into collection.
+        
+        Uses upsert semantics - if point ID exists, it's updated,
+        otherwise it's inserted. This ensures idempotent indexing.
+        
+        Args:
+            collection_name: Name of the collection
+            points: List of points to upsert
+            
+        Raises:
+            VectorDBError: If upsert fails
+        """
+        if not points:
+            logger.warning("No points to upsert")
+            return
+        
+        try:
+            self.client.upsert(
+                collection_name=collection_name,
+                points=points
+            )
+            logger.info(
+                f"Upserted {len(points)} points to '{collection_name}'"
+            )
+        except Exception as e:
+            logger.error(f"Failed to upsert points: {e}")
+            raise VectorDBError(f"Failed to upsert points: {e}")
+    
+    def delete_document_vectors(
+        self,
+        collection_name: str,
+        document_id: int
+    ) -> None:
+        """
+        Delete all vectors for a document.
+        
+        Used for re-indexing when document content changes.
+        Removes all chunks associated with the document ID.
+        
+        Args:
+            collection_name: Name of the collection
+            document_id: Document ID to delete vectors for
+            
+        Raises:
+            VectorDBError: If deletion fails
+        """
+        try:
+            # Delete all points where document_id matches
+            self.client.delete(
+                collection_name=collection_name,
+                points_selector=Filter(
+                    must=[
+                        FieldCondition(
+                            key="document_id",
+                            match=MatchValue(value=document_id)
+                        )
+                    ]
+                )
+            )
+            logger.info(
+                f"Deleted vectors for document_id={document_id} "
+                f"from '{collection_name}'"
+            )
+        except Exception as e:
+            logger.error(
+                f"Failed to delete vectors for document_id={document_id}: {e}"
+            )
+            raise VectorDBError(
+                f"Failed to delete vectors for document_id={document_id}: {e}"
+            )
+    
+    def get_collection_info(self, collection_name: str) -> Dict[str, Any]:
+        """
+        Get collection information.
+        
+        Args:
+            collection_name: Name of the collection
+            
+        Returns:
+            Collection information including point count, config, etc.
+            
+        Raises:
+            VectorDBError: If collection doesn't exist or query fails
+        """
+        try:
+            collection = self.client.get_collection(collection_name)
+            return {
+                "name": collection_name,
+                "points_count": collection.points_count,
+                "vector_size": collection.config.params.vectors.size,
+                "distance": collection.config.params.vectors.distance.name,
+                "status": collection.status.name
+            }
+        except Exception as e:
+            logger.error(f"Failed to get collection info: {e}")
+            raise VectorDBError(f"Failed to get collection info: {e}")
+    
+    # Phase 8 will add:
+    # - search_with_filter() for similarity search with ACL filtering
+    # - get_point() for retrieving specific vectors
+    # - scroll() for pagination
 
 
 # Global Qdrant service instance
