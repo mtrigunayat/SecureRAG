@@ -51,7 +51,7 @@ class Settings(BaseSettings):
     
     # Retrieval Configuration (Phase 8)
     retrieval_top_k: int = 5  # Maximum number of chunks to retrieve
-    retrieval_score_threshold: float = 0.7  # Minimum similarity score (cosine)
+    retrieval_score_threshold: float = 0.4  # Minimum similarity score (cosine)
     
     model_config = SettingsConfigDict(
         env_file=".env",
