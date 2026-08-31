@@ -214,7 +214,7 @@ The backend extracts user identity from JWT token and applies ACL filtering.
 3. **Open browser**: http://localhost:5173
 
 4. **Test login**:
-   - Username: `alice` (engineering)
+   - Username: `mohit` (engineering)
    - Password: `password123`
    - Verify redirect to /chat
 
@@ -246,9 +246,9 @@ The backend extracts user identity from JWT token and applies ACL filtering.
 ### Test Users
 
 From Phase 9 backend:
-- **alice** / password123 → Engineering department
-- **bob** / password123 → HR department
-- **charlie** / password123 → Sales department
+- **mohit** / password123 → Engineering department
+- **karthik** / password123 → HR department
+- **swathi** / password123 → Sales department
 
 Each user only sees documents from their department.
 

@@ -10,11 +10,7 @@ from app.main import app
 from app.services.token_service import create_access_token
 
 
-@pytest.fixture
-def client():
-    """Test client"""
-    return TestClient(app)
-
+# Note: Using client fixture from conftest.py which includes database setup
 
 class TestLoginEndpoint:
     """Login endpoint tests"""
@@ -24,7 +20,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com",
+                "email": "mohit@aithinkers.com",
                 "password": "password123"
             }
         )
@@ -39,7 +35,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com",
+                "email": "mohit@aithinkers.com",
                 "password": "wrongpassword"
             }
         )
@@ -71,7 +67,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com",
+                "email": "mohit@aithinkers.com",
                 "password": "password123"
             }
         )
@@ -89,7 +85,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "bob@company.com",
+                "email": "karthik@aithinkers.com",
                 "password": "password123"
             }
         )
@@ -108,7 +104,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "charlie@company.com",
+                "email": "swathi@aithinkers.com",
                 "password": "password123"
             }
         )
@@ -151,7 +147,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com"
+                "email": "mohit@aithinkers.com"
             }
         )
         
@@ -162,7 +158,7 @@ class TestLoginEndpoint:
         response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com",
+                "email": "mohit@aithinkers.com",
                 "password": "PASSWORD123"  # Wrong case
             }
         )
@@ -179,7 +175,7 @@ class TestCurrentUserEndpoint:
         login_response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com",
+                "email": "mohit@aithinkers.com",
                 "password": "password123"
             }
         )
@@ -193,8 +189,8 @@ class TestCurrentUserEndpoint:
         assert response.status_code == 200
         data = response.json()
         
-        assert data["username"] == "alice"
-        assert data["email"] == "alice@company.com"
+        assert data["username"] == "mohit"
+        assert data["email"] == "mohit@aithinkers.com"
         
     def test_missing_token_is_rejected(self, client):
         """Missing token is rejected"""
@@ -251,7 +247,7 @@ class TestCurrentUserEndpoint:
         login_response = client.post(
             "/api/auth/login",
             json={
-                "email": "bob@company.com",  # Bob is in Sales
+                "email": "karthik@aithinkers.com",  # Bob is in Sales
                 "password": "password123"
             }
         )
@@ -275,7 +271,7 @@ class TestCurrentUserEndpoint:
         login_response = client.post(
             "/api/auth/login",
             json={
-                "email": "charlie@company.com",
+                "email": "swathi@aithinkers.com",
                 "password": "password123"
             }
         )
@@ -312,7 +308,7 @@ class TestCurrentUserEndpoint:
         login_response = client.post(
             "/api/auth/login",
             json={
-                "email": "alice@company.com",
+                "email": "mohit@aithinkers.com",
                 "password": "password123"
             }
         )

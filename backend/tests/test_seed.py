@@ -27,15 +27,17 @@ def test_seed_database(test_db):
     # Seed users
     users = seed_users(test_db, departments)
     
-    assert len(users) == 3
-    assert "alice" in users
-    assert "bob" in users
-    assert "charlie" in users
+    assert len(users) == 4
+    assert "mohit" in users
+    assert "deepak" in users
+    assert "karthik" in users
+    assert "swathi" in users
     
     # Verify user-department relationships
-    assert users["alice"].department == departments["engineering"]
-    assert users["bob"].department == departments["sales"]
-    assert users["charlie"].department == departments["hr"]
+    assert users["mohit"].department == departments["engineering"]
+    assert users["deepak"].department == departments["engineering"]
+    assert users["karthik"].department == departments["sales"]
+    assert users["swathi"].department == departments["hr"]
     
     # Seed documents
     documents = seed_documents(test_db, departments)

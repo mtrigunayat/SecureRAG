@@ -286,9 +286,9 @@ alembic upgrade head
 **Users:**
 | Username | Email | Department | Full Name |
 |----------|-------|------------|-----------|
-| alice | alice@company.com | engineering | Alice Johnson |
-| bob | bob@company.com | sales | Bob Smith |
-| charlie | charlie@company.com | hr | Charlie Williams |
+| alice | mohit@aithinkers.com | engineering | Mohit Johnson |
+| bob | karthik@aithinkers.com | sales | Karthik Smith |
+| charlie | swathi@aithinkers.com | hr | Swathi Williams |
 
 **Documents:** 12 documents across departments
 
@@ -429,7 +429,7 @@ python scripts/manage_db.py reset
 **Decision:** Users belong to ONE department currently
 
 **Rationale:**
-- Meets assignment requirements (Alice → Engineering, Bob → Sales, Charlie → HR)
+- Meets assignment requirements (Mohit → Engineering, Karthik → Sales, Swathi → HR)
 - Simple and clear for POC
 - Schema supports future multi-department membership (add junction table later)
 

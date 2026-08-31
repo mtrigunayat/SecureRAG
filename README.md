@@ -231,7 +231,7 @@ FastAPI decodes JWT → extracts user_id from "sub" claim
 ### Step 2: User Resolution
 ```
 user_id → PostgreSQL UserRepository
-Returns: User(id=1, username="alice", department_id=1)
+Returns: User(id=1, username="mohit", department_id=1)
 Loads: Department(id=1, name="engineering")
 ```
 
@@ -483,9 +483,9 @@ Qdrant Indexing
 
 | User | Department | Can Access |
 |------|-----------|------------|
-| **Alice** | Engineering | Engineering documents only |
-| **Bob** | Sales | Sales documents only |
-| **Charlie** | HR | HR documents only |
+| **Mohit** | Engineering | Engineering documents only |
+| **Karthik** | Sales | Sales documents only |
+| **Swathi** | HR | HR documents only |
 
 ### Security Guarantee
 
@@ -689,7 +689,7 @@ filter = Filter(must=[
 **Request**:
 ```json
 {
-  "username": "alice",
+  "username": "mohit",
   "password": "password123"
 }
 ```
@@ -716,9 +716,9 @@ Authorization: Bearer <token>
 ```json
 {
   "id": 1,
-  "username": "alice",
-  "email": "alice@company.com",
-  "full_name": "Alice Anderson",
+  "username": "mohit",
+  "email": "mohit@aithinkers.com",
+  "full_name": "Mohit Trigunayat",
   "department": {
     "id": 1,
     "name": "engineering"
@@ -975,7 +975,7 @@ Frontend will start at: **http://localhost:5173**
 
 1. **Open**: http://localhost:5173
 2. **Login**: 
-   - Username: `alice`
+   - Username: `mohit`
    - Password: `password123`
 3. **Ask**: "What is the deployment process?"
 4. **Verify**: 
@@ -1061,7 +1061,7 @@ graph TB
 |----------------|---------------------|--------|
 | **Normal RAG query** | `test_rag_service.py::test_generate_success` | ✅ |
 | **No relevant document** | `test_rag_service.py::test_generate_empty_retrieval_no_llm_call` | ✅ |
-| **Unauthorized document access** | `test_document_authorization.py::test_alice_cannot_access_sales_documents` | ✅ |
+| **Unauthorized document access** | `test_document_authorization.py::test_mohit_cannot_access_sales_documents` | ✅ |
 | **Prompt injection** | `test_prompt_builder.py::test_build_with_malicious_context` | ✅ |
 | **Hallucination / unsupported question** | `test_retrieval_service.py::test_empty_retrieval` | ✅ |
 
@@ -1211,18 +1211,18 @@ This is a **proof-of-concept**. Production deployment would require:
 
 ## Quick Demo
 
-### Scenario 1: Normal RAG Query (Alice, Engineering)
+### Scenario 1: Normal RAG Query (Mohit, Engineering)
 
 1. **Login**: alice / password123
 2. **Ask**: "What is the deployment process?"
 3. **Expected**: Answer with Engineering document sources
 4. **Verify**: ✅ Relevant answer, ✅ Engineering sources only
 
-### Scenario 2: Cross-Department Access Blocked (Alice → Sales)
+### Scenario 2: Cross-Department Access Blocked (Mohit → Sales)
 
 1. **Ask**: "What is the sales strategy?"
 2. **Expected**: "I don't have information about that in the knowledge base."
-3. **Why**: Alice is Engineering, Sales docs are department_id=2
+3. **Why**: Mohit is Engineering, Sales docs are department_id=2
 4. **Verify**: ✅ No sales information, ✅ ACL enforced
 
 ### Scenario 3: Hallucination Test

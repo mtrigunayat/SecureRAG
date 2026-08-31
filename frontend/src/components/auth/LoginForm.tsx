@@ -103,7 +103,7 @@ export function LoginForm() {
 
         <div className="login-footer">
           <p className="help-text">
-            Test users: alice (engineering), bob (hr), charlie (sales)
+            Test users: mohit (engineering), karthik (sales), swathi (hr)
           </p>
         </div>
       </div>

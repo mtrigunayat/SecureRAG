@@ -34,9 +34,9 @@ class TestAuthorizationScope:
         # Create user
         user = User(
             id=1,
-            username="alice",
-            email="alice@company.com",
-            full_name="Alice Johnson",
+            username="mohit",
+            email="mohit@aithinkers.com",
+            full_name="Mohit Trigunayat",
             password_hash="hash",
             department_id=dept.id
         )
@@ -55,9 +55,9 @@ class TestAuthorizationScope:
         """Scope creation fails if user has no department."""
         user = User(
             id=1,
-            username="alice",
-            email="alice@company.com",
-            full_name="Alice Johnson",
+            username="mohit",
+            email="mohit@aithinkers.com",
+            full_name="Mohit Trigunayat",
             password_hash="hash",
             department_id=1
         )
@@ -79,9 +79,9 @@ class TestAuthorizationService:
         # Create user
         user = User(
             id=1,
-            username="alice",
-            email="alice@company.com",
-            full_name="Alice Johnson",
+            username="mohit",
+            email="mohit@aithinkers.com",
+            full_name="Mohit Trigunayat",
             password_hash="hash",
             department_id=dept.id
         )
@@ -114,9 +114,9 @@ class TestAuthorizationService:
         # Create user in engineering
         user = User(
             id=1,
-            username="alice",
-            email="alice@company.com",
-            full_name="Alice Johnson",
+            username="mohit",
+            email="mohit@aithinkers.com",
+            full_name="Mohit Trigunayat",
             password_hash="hash",
             department_id=engineering.id
         )
@@ -147,9 +147,9 @@ class TestAuthorizationService:
         
         user = User(
             id=1,
-            username="alice",
-            email="alice@company.com",
-            full_name="Alice Johnson",
+            username="mohit",
+            email="mohit@aithinkers.com",
+            full_name="Mohit Trigunayat",
             password_hash="hash",
             department_id=dept.id
         )
@@ -168,9 +168,9 @@ class TestAuthorizationService:
         """Filter creation fails if user has no department."""
         user = User(
             id=1,
-            username="alice",
-            email="alice@company.com",
-            full_name="Alice Johnson",
+            username="mohit",
+            email="mohit@aithinkers.com",
+            full_name="Mohit Trigunayat",
             password_hash="hash",
             department_id=1
         )

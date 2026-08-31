@@ -3,6 +3,7 @@ Tests for database models
 """
 import pytest
 from sqlalchemy.exc import IntegrityError
+import bcrypt
 
 from app.models.department import Department
 from app.models.user import User
@@ -46,19 +47,21 @@ def test_create_user(test_db):
     test_db.commit()
     
     # Create user
+    password_hash = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user = User(
-        username="alice",
-        email="alice@company.com",
-        full_name="Alice Johnson",
+        username="mohit",
+        email="mohit@aithinkers.com",
+        full_name="Mohit Trigunayat",
+        password_hash=password_hash,
         department_id=department.id
     )
     test_db.add(user)
     test_db.commit()
     
     assert user.id is not None
-    assert user.username == "alice"
-    assert user.email == "alice@company.com"
-    assert user.full_name == "Alice Johnson"
+    assert user.username == "mohit"
+    assert user.email == "mohit@aithinkers.com"
+    assert user.full_name == "Mohit Trigunayat"
     assert user.department_id == department.id
     assert user.created_at is not None
 
@@ -69,10 +72,12 @@ def test_user_email_unique(test_db):
     test_db.add(department)
     test_db.commit()
     
+    password_hash = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user1 = User(
-        username="alice",
-        email="alice@company.com",
+        username="mohit",
+        email="mohit@aithinkers.com",
         full_name="Alice",
+        password_hash=password_hash,
         department_id=department.id
     )
     test_db.add(user1)
@@ -80,8 +85,9 @@ def test_user_email_unique(test_db):
     
     user2 = User(
         username="alice2",
-        email="alice@company.com",
+        email="mohit@aithinkers.com",
         full_name="Alice 2",
+        password_hash=password_hash,
         department_id=department.id
     )
     test_db.add(user2)
@@ -92,10 +98,12 @@ def test_user_email_unique(test_db):
 
 def test_user_requires_department(test_db):
     """Test that user must belong to a department."""
+    password_hash = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user = User(
-        username="alice",
-        email="alice@company.com",
-        full_name="Alice Johnson",
+        username="mohit",
+        email="mohit@aithinkers.com",
+        full_name="Mohit Trigunayat",
+        password_hash=password_hash,
         department_id=999  # Non-existent department
     )
     test_db.add(user)
@@ -149,16 +157,19 @@ def test_department_user_relationship(test_db):
     test_db.add(department)
     test_db.commit()
     
+    password_hash = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user1 = User(
-        username="alice",
-        email="alice@company.com",
+        username="mohit",
+        email="mohit@aithinkers.com",
         full_name="Alice",
+        password_hash=password_hash,
         department_id=department.id
     )
     user2 = User(
-        username="bob",
-        email="bob@company.com",
+        username="karthik",
+        email="karthik@aithinkers.com",
         full_name="Bob",
+        password_hash=password_hash,
         department_id=department.id
     )
     test_db.add_all([user1, user2])
@@ -209,10 +220,12 @@ def test_cascade_delete_department(test_db):
     test_db.add(department)
     test_db.commit()
     
+    password_hash = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user = User(
-        username="alice",
-        email="alice@company.com",
+        username="mohit",
+        email="mohit@aithinkers.com",
         full_name="Alice",
+        password_hash=password_hash,
         department_id=department.id
     )
     document = Document(

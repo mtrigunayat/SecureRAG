@@ -21,7 +21,7 @@ class LoginRequest(BaseModel):
         "json_schema_extra": {
             "examples": [
                 {
-                    "email": "alice@company.com",
+                    "email": "mohit@aithinkers.com",
                     "password": "password123"
                 }
             ]
@@ -90,9 +90,9 @@ class CurrentUserResponse(BaseModel):
             "examples": [
                 {
                     "id": 1,
-                    "username": "alice",
-                    "email": "alice@company.com",
-                    "full_name": "Alice Johnson",
+                    "username": "mohit",
+                    "email": "mohit@aithinkers.com",
+                    "full_name": "Mohit Trigunayat",
                     "department": {
                         "id": 1,
                         "name": "engineering",

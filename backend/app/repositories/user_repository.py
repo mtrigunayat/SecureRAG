@@ -107,7 +107,8 @@ class UserRepository:
         username: str,
         email: str,
         full_name: str,
-        department_id: int
+        department_id: int,
+        password_hash: str = None
     ) -> User:
         """
         Create a new user.
@@ -117,6 +118,7 @@ class UserRepository:
             email: Unique email address
             full_name: User's full name
             department_id: Department ID
+            password_hash: Optional password hash (for testing)
             
         Returns:
             Created user
@@ -124,11 +126,17 @@ class UserRepository:
         Raises:
             DatabaseError: If username or email already exists, or department not found
         """
+        # Use a default password hash if none provided (for testing)
+        if password_hash is None:
+            import bcrypt
+            password_hash = bcrypt.hashpw("password123".encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        
         try:
             user = User(
                 username=username,
                 email=email,
                 full_name=full_name,
+                password_hash=password_hash,
                 department_id=department_id
             )
             self.db.add(user)

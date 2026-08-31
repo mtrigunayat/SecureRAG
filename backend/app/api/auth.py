@@ -49,7 +49,7 @@ async def login(
     Usage:
         POST /api/auth/login
         {
-            "email": "alice@company.com",
+            "email": "mohit@aithinkers.com",
             "password": "password123"
         }
         
@@ -104,9 +104,9 @@ async def get_current_user_info(
         Response:
         {
             "id": 1,
-            "username": "alice",
-            "email": "alice@company.com",
-            "full_name": "Alice Johnson",
+            "username": "mohit",
+            "email": "mohit@aithinkers.com",
+            "full_name": "Mohit Trigunayat",
             "department": {
                 "id": 1,
                 "name": "engineering",

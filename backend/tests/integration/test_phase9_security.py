@@ -36,7 +36,7 @@ class TestCrossDepartmentLLMSecurity:
         """Create engineering user."""
         user = Mock(spec=User)
         user.id = 1
-        user.username = "alice"
+        user.username = "mohit"
         user.department_id = 1
         user.department = Mock(spec=Department)
         user.department.id = 1
@@ -48,7 +48,7 @@ class TestCrossDepartmentLLMSecurity:
         """Create HR user."""
         user = Mock(spec=User)
         user.id = 2
-        user.username = "bob"
+        user.username = "karthik"
         user.department_id = 2
         user.department = Mock(spec=Department)
         user.department.id = 2

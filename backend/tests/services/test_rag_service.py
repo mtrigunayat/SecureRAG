@@ -27,7 +27,7 @@ class TestRAGService:
         """Create mock authenticated user."""
         user = Mock(spec=User)
         user.id = 1
-        user.username = "alice"
+        user.username = "mohit"
         user.department_id = 1
         user.department = Mock(spec=Department)
         user.department.id = 1

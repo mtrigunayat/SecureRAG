@@ -161,9 +161,9 @@ Document.department_id (FK) → Department.id
 **Departments:** engineering, sales, hr, general
 
 **Users:**
-- alice@company.com (engineering)
-- bob@company.com (sales)
-- charlie@company.com (hr)
+- mohit@aithinkers.com (engineering)
+- karthik@aithinkers.com (sales)
+- swathi@aithinkers.com (hr)
 
 **Documents:** 12 documents across all departments
 - Engineering: 3 docs (deployment, coding standards, architecture)

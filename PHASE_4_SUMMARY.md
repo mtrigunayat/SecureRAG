@@ -175,7 +175,7 @@ Total: 42 passed, 0 failed
 ```bash
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "alice@company.com", "password": "password123"}'
+  -d '{"email": "mohit@aithinkers.com", "password": "password123"}'
 ```
 
 **Response:**
@@ -197,9 +197,9 @@ curl -X GET http://localhost:8000/api/auth/me \
 ```json
 {
   "id": 2,
-  "username": "alice",
-  "email": "alice@company.com",
-  "full_name": "Alice Johnson",
+  "username": "mohit",
+  "email": "mohit@aithinkers.com",
+  "full_name": "Mohit Johnson",
   "department": {
     "id": 1,
     "name": "engineering",
@@ -215,7 +215,7 @@ curl -X GET http://localhost:8000/api/auth/me \
 ```bash
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "alice@company.com", "password": "wrongpassword"}'
+  -d '{"email": "mohit@aithinkers.com", "password": "wrongpassword"}'
 ```
 
 **Response:**
@@ -266,9 +266,9 @@ curl http://localhost:8000/api/health
 
 | Email | Password | Department |
 |-------|----------|------------|
-| alice@company.com | password123 | Engineering |
-| bob@company.com | password123 | Sales |
-| charlie@company.com | password123 | HR |
+| mohit@aithinkers.com | password123 | Engineering |
+| karthik@aithinkers.com | password123 | Sales |
+| swathi@aithinkers.com | password123 | HR |
 
 ---
 
@@ -338,7 +338,7 @@ uvicorn app.main:app --reload
 # Login
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email": "alice@company.com", "password": "password123"}'
+  -d '{"email": "mohit@aithinkers.com", "password": "password123"}'
 
 # Get user info
 curl -X GET http://localhost:8000/api/auth/me \

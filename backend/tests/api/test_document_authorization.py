@@ -4,7 +4,7 @@ Document API Authorization Tests
 Tests for department-based authorization on document endpoints.
 
 CRITICAL SECURITY TESTS:
-    - Access matrix: Alice (Engineering), Bob (Sales), Charlie (HR)
+    - Access matrix: Mohit (Engineering), Karthik (Sales), Swathi (HR)
     - Client manipulation tests (query params, headers, body)
     - Authorization vs Authentication boundary
     - Information leakage prevention
@@ -18,9 +18,9 @@ class TestDocumentAccessMatrix:
     Test access matrix for department-based authorization.
     
     Users:
-        Alice → Engineering (dept_id=1)
-        Bob → Sales (dept_id=2)
-        Charlie → HR (dept_id=3)
+        Mohit → Engineering (dept_id=1)
+        Karthik → Sales (dept_id=2)
+        Swathi → HR (dept_id=3)
     
     Documents:
         Engineering: docs 1,2,3
@@ -29,21 +29,21 @@ class TestDocumentAccessMatrix:
     
     Matrix:
                      Eng(1-3)  Sales(4-6)  HR(7-9)
-        Alice (Eng)    ✓          ✗          ✗
-        Bob (Sales)    ✗          ✓          ✗
-        Charlie (HR)   ✗          ✗          ✓
+        Mohit (Eng)    ✓          ✗          ✗
+        Karthik (Sales)    ✗          ✓          ✗
+        Swathi (HR)   ✗          ✗          ✓
     """
     
     # ============================================================
-    # Alice (Engineering) Access Tests
+    # Mohit (Engineering) Access Tests
     # ============================================================
     
-    def test_alice_can_access_engineering_documents(self, client: TestClient):
-        """Alice can access Engineering documents."""
+    def test_mohit_can_access_engineering_documents(self, client: TestClient):
+        """Mohit can access Engineering documents."""
         # Login as Alice
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -59,11 +59,11 @@ class TestDocumentAccessMatrix:
             assert data["id"] == doc_id
             assert data["department"]["name"] == "engineering"
     
-    def test_alice_cannot_access_sales_documents(self, client: TestClient):
-        """Alice cannot access Sales documents."""
+    def test_mohit_cannot_access_sales_documents(self, client: TestClient):
+        """Mohit cannot access Sales documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -77,11 +77,11 @@ class TestDocumentAccessMatrix:
             assert response.status_code == 403
             assert "permission" in response.json()["detail"].lower()
     
-    def test_alice_cannot_access_hr_documents(self, client: TestClient):
-        """Alice cannot access HR documents."""
+    def test_mohit_cannot_access_hr_documents(self, client: TestClient):
+        """Mohit cannot access HR documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -96,14 +96,14 @@ class TestDocumentAccessMatrix:
             assert "permission" in response.json()["detail"].lower()
     
     # ============================================================
-    # Bob (Sales) Access Tests
+    # Karthik (Sales) Access Tests
     # ============================================================
     
-    def test_bob_can_access_sales_documents(self, client: TestClient):
-        """Bob can access Sales documents."""
+    def test_karthik_can_access_sales_documents(self, client: TestClient):
+        """Karthik can access Sales documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "bob@company.com", "password": "password123"}
+            json={"email": "karthik@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -119,11 +119,11 @@ class TestDocumentAccessMatrix:
             assert data["id"] == doc_id
             assert data["department"]["name"] == "sales"
     
-    def test_bob_cannot_access_engineering_documents(self, client: TestClient):
-        """Bob cannot access Engineering documents."""
+    def test_karthik_cannot_access_engineering_documents(self, client: TestClient):
+        """Karthik cannot access Engineering documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "bob@company.com", "password": "password123"}
+            json={"email": "karthik@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -136,11 +136,11 @@ class TestDocumentAccessMatrix:
             
             assert response.status_code == 403
     
-    def test_bob_cannot_access_hr_documents(self, client: TestClient):
-        """Bob cannot access HR documents."""
+    def test_karthik_cannot_access_hr_documents(self, client: TestClient):
+        """Karthik cannot access HR documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "bob@company.com", "password": "password123"}
+            json={"email": "karthik@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -154,14 +154,14 @@ class TestDocumentAccessMatrix:
             assert response.status_code == 403
     
     # ============================================================
-    # Charlie (HR) Access Tests
+    # Swathi (HR) Access Tests
     # ============================================================
     
-    def test_charlie_can_access_hr_documents(self, client: TestClient):
-        """Charlie can access HR documents."""
+    def test_swathi_can_access_hr_documents(self, client: TestClient):
+        """Swathi can access HR documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "charlie@company.com", "password": "password123"}
+            json={"email": "swathi@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -177,11 +177,11 @@ class TestDocumentAccessMatrix:
             assert data["id"] == doc_id
             assert data["department"]["name"] == "hr"
     
-    def test_charlie_cannot_access_engineering_documents(self, client: TestClient):
-        """Charlie cannot access Engineering documents."""
+    def test_swathi_cannot_access_engineering_documents(self, client: TestClient):
+        """Swathi cannot access Engineering documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "charlie@company.com", "password": "password123"}
+            json={"email": "swathi@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -194,11 +194,11 @@ class TestDocumentAccessMatrix:
             
             assert response.status_code == 403
     
-    def test_charlie_cannot_access_sales_documents(self, client: TestClient):
-        """Charlie cannot access Sales documents."""
+    def test_swathi_cannot_access_sales_documents(self, client: TestClient):
+        """Swathi cannot access Sales documents."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "charlie@company.com", "password": "password123"}
+            json={"email": "swathi@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -245,10 +245,10 @@ class TestAuthenticationBoundary:
     
     def test_authenticated_unauthorized_returns_403(self, client: TestClient):
         """Authenticated user without permission returns 403 (not 401)."""
-        # Login as Alice (Engineering)
+        # Login as Mohit (Engineering)
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -272,10 +272,10 @@ class TestClientManipulation:
     
     def test_query_parameter_cannot_override_department(self, client: TestClient):
         """Query parameter ?department=X cannot override user's department."""
-        # Login as Alice (Engineering)
+        # Login as Mohit (Engineering)
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -292,7 +292,7 @@ class TestClientManipulation:
         """Custom header X-Department cannot override user's department."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -313,7 +313,7 @@ class TestClientManipulation:
         """?department_id=X cannot override user's department."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -333,7 +333,7 @@ class TestDataIntegrity:
         """Nonexistent document returns 404 (not 403)."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -350,7 +350,7 @@ class TestDataIntegrity:
         """Invalid document ID format returns 422."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -370,7 +370,7 @@ class TestInformationLeakage:
         """Unauthorized access returns generic error (no document details)."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         
@@ -393,7 +393,7 @@ class TestInformationLeakage:
         """Document response never includes password_hash or sensitive data."""
         login_response = client.post(
             "/api/auth/login",
-            json={"email": "alice@company.com", "password": "password123"}
+            json={"email": "mohit@aithinkers.com", "password": "password123"}
         )
         token = login_response.json()["access_token"]
         

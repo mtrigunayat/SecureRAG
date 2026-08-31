@@ -49,15 +49,15 @@ def test_user_repository_create(test_db):
     
     dept = dept_repo.create("engineering")
     user = user_repo.create(
-        username="alice",
-        email="alice@company.com",
-        full_name="Alice Johnson",
+        username="testuser1",
+        email="testuser1@example.com",
+        full_name="Test User 1",
         department_id=dept.id
     )
     
     assert user.id is not None
-    assert user.username == "alice"
-    assert user.email == "alice@company.com"
+    assert user.username == "testuser1"
+    assert user.email == "testuser1@example.com"
     assert user.department_id == dept.id
 
 
@@ -67,12 +67,12 @@ def test_user_repository_get_by_username(test_db):
     user_repo = UserRepository(test_db)
     
     dept = dept_repo.create("engineering")
-    user_repo.create("alice", "alice@company.com", "Alice", dept.id)
+    user_repo.create("testuser2", "testuser2@example.com", "Test User 2", dept.id)
     
-    user = user_repo.get_by_username("alice")
+    user = user_repo.get_by_username("testuser2")
     
     assert user is not None
-    assert user.username == "alice"
+    assert user.username == "testuser2"
 
 
 def test_user_repository_get_by_department(test_db):
@@ -81,8 +81,8 @@ def test_user_repository_get_by_department(test_db):
     user_repo = UserRepository(test_db)
     
     dept = dept_repo.create("engineering")
-    user_repo.create("alice", "alice@company.com", "Alice", dept.id)
-    user_repo.create("bob", "bob@company.com", "Bob", dept.id)
+    user_repo.create("testuser3", "testuser3@example.com", "Test User 3", dept.id)
+    user_repo.create("testuser4", "testuser4@example.com", "Test User 4", dept.id)
     
     users = user_repo.get_by_department(dept.id)
     

@@ -4,9 +4,10 @@ Database seed script
 Creates initial departments, users, and documents for development and testing.
 
 DEVELOPMENT CREDENTIALS (POC ONLY):
-- alice@company.com / password123
-- bob@company.com / password123
-- charlie@company.com / password123
+- mohit@aithinkers.com / password123
+- deepak@aithinkers.com / password123
+- karthik@aithinkers.com / password123
+- swathi@aithinkers.com / password123
 
 WARNING: These are development-only credentials. Never use in production.
 """
@@ -64,9 +65,10 @@ def seed_users(db: Session, departments: dict) -> dict:
         Dictionary mapping usernames to User objects
         
     Development Credentials (POC ONLY):
-        - alice@company.com / password123
-        - bob@company.com / password123
-        - charlie@company.com / password123
+        - mohit@aithinkers.com / password123
+        - deepak@aithinkers.com / password123
+        - karthik@aithinkers.com / password123
+        - swathi@aithinkers.com / password123
     """
     # Development password (POC ONLY - never use in production)
     dev_password = "password123"
@@ -74,23 +76,30 @@ def seed_users(db: Session, departments: dict) -> dict:
     
     users_data = [
         {
-            "username": "alice",
-            "email": "alice@company.com",
-            "full_name": "Alice Johnson",
+            "username": "mohit",
+            "email": "mohit@aithinkers.com",
+            "full_name": "Mohit Trigunayat",
             "password_hash": dev_password_hash,
             "department_id": departments["engineering"].id
         },
         {
-            "username": "bob",
-            "email": "bob@company.com",
-            "full_name": "Bob Smith",
+            "username": "deepak",
+            "email": "deepak@aithinkers.com",
+            "full_name": "Deepak Sharma",
+            "password_hash": dev_password_hash,
+            "department_id": departments["engineering"].id
+        },
+        {
+            "username": "karthik",
+            "email": "karthik@aithinkers.com",
+            "full_name": "Karthik Reddy",
             "password_hash": dev_password_hash,
             "department_id": departments["sales"].id
         },
         {
-            "username": "charlie",
-            "email": "charlie@company.com",
-            "full_name": "Charlie Williams",
+            "username": "swathi",
+            "email": "swathi@aithinkers.com",
+            "full_name": "Swathi Iyer",
             "password_hash": dev_password_hash,
             "department_id": departments["hr"].id
         },

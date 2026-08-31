@@ -122,36 +122,44 @@ def client(test_db):
     test_db.add_all([engineering, sales, hr, general])
     test_db.flush()
     
-    # Create users (alice, bob, charlie)
+    # Create users (mohit, deepak, karthik, swathi)
     dev_password = "password123"  # POC ONLY
     dev_password_hash = hash_password(dev_password)
     
-    alice = User(
+    mohit = User(
         id=2,  # Match production seed (user id=1 might be reserved)
-        username="alice",
-        email="alice@company.com",
-        full_name="Alice Johnson",
+        username="mohit",
+        email="mohit@aithinkers.com",
+        full_name="Mohit Trigunayat",
         password_hash=dev_password_hash,
         department_id=engineering.id
     )
-    bob = User(
+    deepak = User(
         id=3,
-        username="bob",
-        email="bob@company.com",
-        full_name="Bob Smith",
+        username="deepak",
+        email="deepak@aithinkers.com",
+        full_name="Deepak Sharma",
+        password_hash=dev_password_hash,
+        department_id=engineering.id
+    )
+    karthik = User(
+        id=4,
+        username="karthik",
+        email="karthik@aithinkers.com",
+        full_name="Karthik Reddy",
         password_hash=dev_password_hash,
         department_id=sales.id
     )
-    charlie = User(
-        id=4,
-        username="charlie",
-        email="charlie@company.com",
-        full_name="Charlie Brown",
+    swathi = User(
+        id=5,
+        username="swathi",
+        email="swathi@aithinkers.com",
+        full_name="Swathi Iyer",
         password_hash=dev_password_hash,
         department_id=hr.id
     )
     
-    test_db.add_all([alice, bob, charlie])
+    test_db.add_all([mohit, deepak, karthik, swathi])
     test_db.flush()
     
     # Create documents

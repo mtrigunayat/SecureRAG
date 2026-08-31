@@ -158,9 +158,9 @@ tests/test_seed.py::test_seed_idempotent PASSED               [ 100%]
 ### Users (3)
 | Username | Email | Department | Full Name |
 |----------|-------|------------|-----------|
-| alice | alice@company.com | engineering | Alice Johnson |
-| bob | bob@company.com | sales | Bob Smith |
-| charlie | charlie@company.com | hr | Charlie Williams |
+| alice | mohit@aithinkers.com | engineering | Mohit Johnson |
+| bob | karthik@aithinkers.com | sales | Karthik Smith |
+| charlie | swathi@aithinkers.com | hr | Swathi Williams |
 
 ### Documents (12)
 

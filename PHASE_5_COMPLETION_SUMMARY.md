@@ -316,24 +316,24 @@ class DocumentMetadataResponse(BaseModel):
 
 | User | Department | Doc 1 (Eng) | Doc 2 (Eng) | Doc 3 (Eng) | Doc 4 (Sales) | Doc 5 (Sales) | Doc 6 (Sales) | Doc 7 (HR) | Doc 8 (HR) | Doc 9 (HR) |
 |------|------------|-------------|-------------|-------------|---------------|---------------|---------------|------------|------------|------------|
-| Alice | Engineering | ✅ 200 | ✅ 200 | ✅ 200 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 |
-| Bob | Sales | ❌ 403 | ❌ 403 | ❌ 403 | ✅ 200 | ✅ 200 | ✅ 200 | ❌ 403 | ❌ 403 | ❌ 403 |
-| Charlie | HR | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ✅ 200 | ✅ 200 | ✅ 200 |
+| Mohit | Engineering | ✅ 200 | ✅ 200 | ✅ 200 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 |
+| Karthik | Sales | ❌ 403 | ❌ 403 | ❌ 403 | ✅ 200 | ✅ 200 | ✅ 200 | ❌ 403 | ❌ 403 | ❌ 403 |
+| Swathi | HR | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ❌ 403 | ✅ 200 | ✅ 200 | ✅ 200 |
 
 ### Manual Verification Results
 
 ```bash
-=== Alice (Engineering) ===
+=== Mohit (Engineering) ===
 ✅ Engineering doc 1: 200 OK
 ✅ Sales doc 4: 403 Forbidden
 ✅ HR doc 7: 403 Forbidden
 
-=== Bob (Sales) ===
+=== Karthik (Sales) ===
 ✅ Engineering doc 1: 403 Forbidden
 ✅ Sales doc 4: 200 OK
 ✅ HR doc 7: 403 Forbidden
 
-=== Charlie (HR) ===
+=== Swathi (HR) ===
 ✅ Engineering doc 1: 403 Forbidden
 ✅ Sales doc 4: 403 Forbidden
 ✅ HR doc 7: 200 OK
@@ -473,7 +473,7 @@ tests/api/test_document_authorization.py::TestInformationLeakage
 #### **tests/conftest.py** (MODIFIED)
 - **Added**: db_session fixture alias for clarity
 - **Enhanced**: client fixture seeds test database with departments, users, documents
-- **Data**: Alice (engineering), Bob (sales), Charlie (hr), Documents 1-12
+- **Data**: Mohit (engineering), Karthik (sales), Swathi (hr), Documents 1-12
 
 ### File Summary
 
@@ -620,7 +620,7 @@ All Phase 5 requirements are complete:
 - [x] **Error Handling**: 401 (auth), 403 (authz), 404 (not found)
 - [x] **Unit Tests**: 6 authorization service tests passing
 - [x] **Integration Tests**: 20 document authorization tests passing
-- [x] **Access Matrix**: Alice/Bob/Charlie department boundaries verified
+- [x] **Access Matrix**: Alice/Bob/Swathi department boundaries verified
 - [x] **Security Tests**: Client manipulation, information leakage prevented
 - [x] **Manual Testing**: curl verification successful for all users
 - [x] **Database Fix**: AuthorizationError re-raised (not converted to 503)
@@ -656,7 +656,7 @@ User will provide Phase 6 requirements separately. Do NOT implement:
 
 ✅ **Phase 5 is complete and verified**  
 ✅ **68/68 tests passing** (42 Phase 4 + 26 Phase 5)  
-✅ **Manual verification successful** (Alice, Bob, Charlie access matrix)  
+✅ **Manual verification successful** (Alice, Bob, Swathi access matrix)  
 ✅ **Authorization architecture documented**  
 ✅ **Future Qdrant integration contract established**  
 ✅ **No blocking issues or unresolved problems**  

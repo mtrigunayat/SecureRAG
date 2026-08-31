@@ -34,17 +34,17 @@ class TestCrossDepartmentIsolation:
     Scenario:
         - Department A: engineering
         - Department B: hr
-        - User Alice → engineering
-        - User Bob → hr
+        - User Mohit → engineering
+        - User Karthik → hr
         - Document "Engineering Policy" → engineering
         - Document "HR Policy" → hr
         
     Test:
-        1. Alice asks about "engineering policy"
+        1. Mohit asks about "engineering policy"
            → MUST retrieve "Engineering Policy"
            → MUST NOT retrieve "HR Policy"
         
-        2. Bob asks about "HR policy"
+        2. Karthik asks about "HR policy"
            → MUST retrieve "HR Policy"
            → MUST NOT retrieve "Engineering Policy"
     """
@@ -77,36 +77,36 @@ class TestCrossDepartmentIsolation:
         user_repo = UserRepository(db)
         
         # Check if test users already exist
-        alice = user_repo.get_by_username("alice_test_phase8")
-        bob = user_repo.get_by_username("bob_test_phase8")
+        mohit = user_repo.get_by_username("mohit_test_phase8")
+        karthik = user_repo.get_by_username("karthik_test_phase8")
         
-        if not alice:
+        if not mohit:
             from app.services.password_service import hash_password
-            alice = User(
-                username="alice_test_phase8",
-                email="alice_phase8@company.com",
-                full_name="Alice Engineering",
+            mohit = User(
+                username="mohit_test_phase8",
+                email="mohit_phase8@aithinkers.com",
+                full_name="Mohit Engineering",
                 password_hash=hash_password("test123"),
                 department_id=engineering.id
             )
-            db.add(alice)
+            db.add(mohit)
         
-        if not bob:
+        if not karthik:
             from app.services.password_service import hash_password
-            bob = User(
-                username="bob_test_phase8",
-                email="bob_phase8@company.com",
-                full_name="Bob HR",
+            karthik = User(
+                username="karthik_test_phase8",
+                email="karthik_phase8@aithinkers.com",
+                full_name="Karthik HR",
                 password_hash=hash_password("test123"),
                 department_id=hr.id
             )
-            db.add(bob)
+            db.add(karthik)
         
         db.commit()
-        db.refresh(alice)
-        db.refresh(bob)
+        db.refresh(mohit)
+        db.refresh(karthik)
         
-        return alice, bob
+        return mohit, karthik
     
     @pytest.fixture(scope="class")
     def setup_documents(self, db, setup_departments):
@@ -148,34 +148,34 @@ class TestCrossDepartmentIsolation:
         
         return eng_doc, hr_doc
     
-    def test_alice_cannot_retrieve_hr_documents(
+    def test_mohit_cannot_retrieve_hr_documents(
         self,
         db,
         setup_users,
         setup_documents
     ):
         """
-        CRITICAL SECURITY TEST: Alice (engineering) cannot retrieve HR documents.
+        CRITICAL SECURITY TEST: Mohit (engineering) cannot retrieve HR documents.
         
         This test verifies:
         1. ACL filtering happens at retrieval time
         2. Department isolation is enforced
         3. Unauthorized documents are NEVER retrieved
         """
-        alice, bob = setup_users
+        mohit, karthik = setup_users
         eng_doc, hr_doc = setup_documents
         
-        # Alice asks a question about HR
-        # Even though HR document exists, she should NOT retrieve it
+        # Mohit asks a question about HR
+        # Even though HR document exists, they should NOT retrieve it
         retrieval_service = RetrievalService(db)
         
         result = retrieval_service.retrieve(
             question="What is the HR leave policy?",
-            authenticated_user=alice
+            authenticated_user=mohit
         )
         
-        # Verify Alice's department was used
-        assert result.user_department_id == alice.department_id
+        # Verify Mohit's department was used
+        assert result.user_department_id == mohit.department_id
         assert result.user_department_name == "engineering"
         
         # CRITICAL: Verify NO HR documents in results
@@ -183,23 +183,23 @@ class TestCrossDepartmentIsolation:
             chunk.document_id == hr_doc.id
             for chunk in result.chunks
         )
-        assert not hr_doc_retrieved, "SECURITY VIOLATION: Alice retrieved HR document!"
+        assert not hr_doc_retrieved, "SECURITY VIOLATION: Mohit retrieved HR document!"
     
-    def test_bob_cannot_retrieve_engineering_documents(
+    def test_karthik_cannot_retrieve_engineering_documents(
         self,
         db,
         setup_users,
         setup_documents
     ):
         """
-        CRITICAL SECURITY TEST: Bob (HR) cannot retrieve engineering documents.
+        CRITICAL SECURITY TEST: Karthik (HR) cannot retrieve engineering documents.
         
-        Mirrors the Alice test for symmetry.
+        Mirrors the Mohit test for symmetry.
         """
-        alice, bob = setup_users
+        mohit, karthik = setup_users
         eng_doc, hr_doc = setup_documents
         
-        # Bob asks about engineering
+        # Karthik asks about engineering
         retrieval_service = RetrievalService(db)
         
         result = retrieval_service.retrieve(
@@ -208,7 +208,7 @@ class TestCrossDepartmentIsolation:
         )
         
         # Verify Bob's department was used
-        assert result.user_department_id == bob.department_id
+        assert result.user_department_id == karthik.department_id
         assert result.user_department_name == "hr"
         
         # CRITICAL: Verify NO engineering documents in results
@@ -218,18 +218,18 @@ class TestCrossDepartmentIsolation:
         )
         assert not eng_doc_retrieved, "SECURITY VIOLATION: Bob retrieved engineering document!"
     
-    def test_alice_can_retrieve_own_department_documents(
+    def test_mohit_can_retrieve_own_department_documents(
         self,
         db,
         setup_users,
         setup_documents
     ):
         """
-        Test that Alice CAN retrieve engineering documents.
+        Test that Mohit CAN retrieve engineering documents.
         
         Verifies the ACL filter allows authorized access.
         """
-        alice, bob = setup_users
+        mohit, karthik = setup_users
         eng_doc, hr_doc = setup_documents
         
         # This test requires documents to be indexed
@@ -238,16 +238,16 @@ class TestCrossDepartmentIsolation:
         
         result = retrieval_service.retrieve(
             question="engineering",
-            authenticated_user=alice
+            authenticated_user=mohit
         )
         
         # Verify department is correct
-        assert result.user_department_id == alice.department_id
+        assert result.user_department_id == mohit.department_id
         
         # If any results returned, verify they're from engineering
         for chunk in result.chunks:
-            assert chunk.department_id == alice.department_id, \
-                f"SECURITY VIOLATION: Alice retrieved chunk from department {chunk.department_id}!"
+            assert chunk.department_id == mohit.department_id, \
+                f"SECURITY VIOLATION: Mohit retrieved chunk from department {chunk.department_id}!"
 
 
 @pytest.mark.integration

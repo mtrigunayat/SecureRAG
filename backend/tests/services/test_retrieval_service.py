@@ -23,7 +23,7 @@ class TestRetrievalService:
         """Create mock authenticated user."""
         user = Mock()
         user.id = 1
-        user.username = "alice"
+        user.username = "mohit"
         user.department_id = 10
         user.department = Mock()
         user.department.id = 10
