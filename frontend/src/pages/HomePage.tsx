@@ -41,6 +41,26 @@ export function HomePage() {
               Learn More
             </a>
           </div>
+
+          {/* Stats Section */}
+          <div className="stats-grid">
+            <div className="stat-item">
+              <div className="stat-number">🔒</div>
+              <div className="stat-label">Department-Level Security</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">⚡</div>
+              <div className="stat-label">Real-time Responses</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">📊</div>
+              <div className="stat-label">Source Attribution</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">🤖</div>
+              <div className="stat-label">AI-Powered Search</div>
+            </div>
+          </div>
         </section>
 
         {/* Features Section */}
@@ -98,6 +118,51 @@ export function HomePage() {
           </div>
         </section>
 
+        {/* How It Works Section */}
+        <section className="how-it-works-section">
+          <h2 className="section-title">How It Works</h2>
+          
+          <div className="steps-container">
+            <div className="step-item">
+              <div className="step-number">1</div>
+              <div className="step-content">
+                <h3>Login Securely</h3>
+                <p>Authenticate with your credentials and get assigned to your department.</p>
+              </div>
+            </div>
+
+            <div className="step-connector">→</div>
+
+            <div className="step-item">
+              <div className="step-number">2</div>
+              <div className="step-content">
+                <h3>Ask Questions</h3>
+                <p>Type your question in natural language about company policies and procedures.</p>
+              </div>
+            </div>
+
+            <div className="step-connector">→</div>
+
+            <div className="step-item">
+              <div className="step-number">3</div>
+              <div className="step-content">
+                <h3>Get Answers</h3>
+                <p>Receive AI-powered answers based only on documents you're authorized to access.</p>
+              </div>
+            </div>
+
+            <div className="step-connector">→</div>
+
+            <div className="step-item">
+              <div className="step-number">4</div>
+              <div className="step-content">
+                <h3>Verify Sources</h3>
+                <p>Review source documents and relevance scores for full transparency.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Tech Stack Section */}
         <section className="tech-section">
           <h2 className="section-title">Technology Stack</h2>
@@ -141,6 +206,37 @@ export function HomePage() {
                 <li>CORS Protection</li>
                 <li>RBAC Authorization</li>
               </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* Benefits Section */}
+        <section className="benefits-section">
+          <h2 className="section-title">Why Choose Secure RAG?</h2>
+          
+          <div className="benefits-grid">
+            <div className="benefit-item">
+              <div className="benefit-icon">💡</div>
+              <h3>Instant Knowledge Access</h3>
+              <p>Find answers to company policies instantly without searching through multiple documents.</p>
+            </div>
+
+            <div className="benefit-item">
+              <div className="benefit-icon">🛡️</div>
+              <h3>Privacy Protected</h3>
+              <p>Department-level isolation ensures you only see information you're authorized to access.</p>
+            </div>
+
+            <div className="benefit-item">
+              <div className="benefit-icon">✅</div>
+              <h3>Verified Accuracy</h3>
+              <p>Every answer includes source attribution with relevance scores for verification.</p>
+            </div>
+
+            <div className="benefit-item">
+              <div className="benefit-icon">⏱️</div>
+              <h3>Save Time</h3>
+              <p>Get answers in seconds instead of spending hours searching through documents.</p>
             </div>
           </div>
         </section>

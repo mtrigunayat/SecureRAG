@@ -11,32 +11,58 @@ interface EmptyStateProps {
 }
 
 const EXAMPLE_QUESTIONS = [
-  'What is the deployment process?',
-  'What is the leave policy?',
-  'What are the working hours?',
+  { icon: '🚀', text: 'What is our deployment process for production releases?', category: 'Engineering' },
+  { icon: '🧪', text: 'What test coverage is required for new code?', category: 'Engineering' },
+  { icon: '🚨', text: 'What is the SEV-1 escalation process?', category: 'Engineering' },
+  { icon: '💰', text: 'What is the standard discount I can offer without manager approval?', category: 'Sales' },
+  { icon: '💵', text: 'What is the monthly price for the Growth tier?', category: 'Sales' },
+  { icon: '🏖️', text: 'How many days of annual leave do employees get?', category: 'HR' },
+  { icon: '🏥', text: 'What is covered under the health insurance benefit?', category: 'HR' },
 ];
 
 export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
   return (
     <div className="empty-state">
       <div className="empty-state-content">
-        <h2 className="empty-state-title">Welcome to Secure RAG Assistant</h2>
-        <p className="empty-state-description">
-          Ask questions about your organization's knowledge base.
-          <br />
-          Only information from your department will be retrieved.
-        </p>
+        <div className="welcome-header">
+          <div className="welcome-icon">🤖</div>
+          <h2 className="empty-state-title">Welcome to Secure RAG Assistant</h2>
+          <p className="empty-state-description">
+            Your AI-powered knowledge assistant with department-level security.
+            <br />
+            Ask questions about your organization's policies, procedures, and documentation.
+          </p>
+        </div>
+
+        <div className="features-highlight">
+          <div className="feature-badge">
+            <span className="feature-badge-icon">🔒</span>
+            <span>Secure Access</span>
+          </div>
+          <div className="feature-badge">
+            <span className="feature-badge-icon">⚡</span>
+            <span>Instant Answers</span>
+          </div>
+          <div className="feature-badge">
+            <span className="feature-badge-icon">📊</span>
+            <span>Source Verified</span>
+          </div>
+        </div>
 
         <div className="suggestions">
           <p className="suggestions-label">Try asking:</p>
           <div className="suggestions-grid">
-            {EXAMPLE_QUESTIONS.map((question) => (
+            {EXAMPLE_QUESTIONS.map((question, index) => (
               <button
-                key={question}
+                key={index}
                 className="suggestion-button"
-                onClick={() => onSuggestionClick(question)}
+                onClick={() => onSuggestionClick(question.text)}
               >
-                {question}
+                <span className="suggestion-icon">{question.icon}</span>
+                <div className="suggestion-content">
+                  <span className="suggestion-text">{question.text}</span>
+                  <span className="suggestion-category">{question.category}</span>
+                </div>
               </button>
             ))}
           </div>

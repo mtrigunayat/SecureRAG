@@ -1,9 +1,12 @@
 .message-list {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 2rem 1.5rem;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+  scroll-behavior: smooth;
 }
 
 .loading-indicator {
@@ -73,20 +76,22 @@
 
 /* Custom scrollbar */
 .message-list::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 .message-list::-webkit-scrollbar-track {
   background: #f7fafc;
+  border-radius: 5px;
 }
 
 .message-list::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
-  border-radius: 4px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 5px;
+  border: 2px solid #f7fafc;
 }
 
 .message-list::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
 @media (max-width: 768px) {

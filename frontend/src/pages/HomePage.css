@@ -17,7 +17,7 @@
 /* Hero Section */
 .hero-section {
   text-align: center;
-  padding: 4rem 0 6rem;
+  padding: 4rem 0 3rem;
 }
 
 .logo-badge {
@@ -68,6 +68,71 @@
   gap: 1.5rem;
   justify-content: center;
   flex-wrap: wrap;
+  margin-bottom: 4rem;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.stat-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.stat-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.stat-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.stat-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.stat-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.stat-number {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.stat-label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  opacity: 0.95;
 }
 
 .btn {
@@ -127,6 +192,187 @@
 .btn-large {
   padding: 1.1rem 2.5rem;
   font-size: 1.15rem;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+  padding: 5rem 2rem;
+  background: white;
+  color: #1a202c;
+  border-radius: 24px;
+  margin-bottom: 3rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+}
+
+.steps-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-top: 3rem;
+}
+
+.step-item {
+  flex: 1;
+  min-width: 200px;
+  max-width: 250px;
+  text-align: center;
+  animation: fadeInScale 0.6s ease-out backwards;
+}
+
+.step-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.step-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.step-item:nth-child(5) {
+  animation-delay: 0.3s;
+}
+
+.step-item:nth-child(7) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.step-number {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+}
+
+.step-item:hover .step-number {
+  transform: scale(1.1) rotate(5deg);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+}
+
+.step-content h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #2d3748;
+}
+
+.step-content p {
+  font-size: 0.95rem;
+  color: #4a5568;
+  line-height: 1.5;
+}
+
+.step-connector {
+  font-size: 2rem;
+  color: #667eea;
+  font-weight: bold;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(10px);
+  }
+}
+
+/* Benefits Section */
+.benefits-section {
+  padding: 4rem 2rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 24px;
+  margin-bottom: 3rem;
+  backdrop-filter: blur(10px);
+}
+
+.benefits-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.benefit-item {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.6s ease-out backwards;
+}
+
+.benefit-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.benefit-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.benefit-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.benefit-item:nth-child(4) {
+  animation-delay: 0.4s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.benefit-item:hover {
+  transform: translateY(-8px) scale(1.05);
+  box-shadow: 0 12px 30px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.benefit-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+.benefit-item h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 0.75rem;
+  color: white;
+}
+
+.benefit-item p {
+  font-size: 1rem;
+  line-height: 1.6;
+  opacity: 0.95;
 }
 
 /* Features Section */
