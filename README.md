@@ -349,7 +349,7 @@ sources = [
 
 ## Document Ingestion
 
-> **📄 For complete document management instructions, see [DOCUMENT_MANAGEMENT.md](DOCUMENT_MANAGEMENT.md)**
+> **📄 For complete document management instructions, see [DOCUMENT_MANAGEMENT.md](docs/DOCUMENT_MANAGEMENT.md)**
 > 
 > - **Add new documents**: Copy PDFs to `documents/` folders, create config, run ingestion script
 > - **Delete all documents**: Run `python scripts/cleanup_all_documents.py`
@@ -956,7 +956,7 @@ docker-compose exec backend python -m scripts.manage_db seed
 
 ### Step 5: Add Documents
 
-**Quick start** - Add your own PDFs (see [DOCUMENT_MANAGEMENT.md](DOCUMENT_MANAGEMENT.md)):
+**Quick start** - Add your own PDFs (see [DOCUMENT_MANAGEMENT.md](docs/DOCUMENT_MANAGEMENT.md)):
 
 ```bash
 # 1. Copy PDFs to documents/ folders
