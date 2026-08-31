@@ -1,0 +1,62 @@
+[
+  {
+    "file_path": "../documents/engineering/eng-coding-standards.pdf",
+    "name": "Coding Standards",
+    "department": "engineering",
+    "sensitivity": "internal"
+  },
+  {
+    "file_path": "../documents/engineering/eng-deployment-guidelines.pdf",
+    "name": "Deployment Guidelines",
+    "department": "engineering",
+    "sensitivity": "internal"
+  },
+  {
+    "file_path": "../documents/engineering/eng-incident-response-guide.pdf",
+    "name": "Incident Response Guide",
+    "department": "engineering",
+    "sensitivity": "confidential"
+  },
+  {
+    "file_path": "../documents/sales/sales-discount-policy.pdf",
+    "name": "Discount Policy",
+    "department": "sales",
+    "sensitivity": "confidential"
+  },
+  {
+    "file_path": "../documents/sales/sales-pricing-policy.pdf",
+    "name": "Pricing Policy",
+    "department": "sales",
+    "sensitivity": "confidential"
+  },
+  {
+    "file_path": "../documents/hr/hr-employee-benefits.pdf",
+    "name": "Employee Benefits Guide",
+    "department": "hr",
+    "sensitivity": "internal"
+  },
+  {
+    "file_path": "../documents/hr/hr-leave-policy.pdf",
+    "name": "Leave Policy",
+    "department": "hr",
+    "sensitivity": "internal"
+  },
+  {
+    "file_path": "../documents/general/general-company-overview.pdf",
+    "name": "Company Overview",
+    "department": "general",
+    "sensitivity": "public"
+  },
+  {
+    "file_path": "../documents/general/general-it-helpdesk-faq.pdf",
+    "name": "IT Helpdesk FAQ",
+    "department": "general",
+    "sensitivity": "internal"
+  },
+  {
+    "file_path": "../documents/general/general-security-policy.pdf",
+    "name": "Security Policy",
+    "department": "general",
+    "sensitivity": "internal"
+  }
+]

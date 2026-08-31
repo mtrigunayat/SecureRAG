@@ -349,6 +349,12 @@ sources = [
 
 ## Document Ingestion
 
+> **📄 For complete document management instructions, see [DOCUMENT_MANAGEMENT.md](DOCUMENT_MANAGEMENT.md)**
+> 
+> - **Add new documents**: Copy PDFs to `documents/` folders, create config, run ingestion script
+> - **Delete all documents**: Run `python scripts/cleanup_all_documents.py`
+> - **Available scripts**: `ingest_documents.py`, `cleanup_all_documents.py`, `manage_db.py`
+
 ### Pipeline Flow
 
 ```
@@ -943,22 +949,34 @@ docker-compose exec backend python -m scripts.manage_db seed
 ```
 
 **Demo Users Created**:
-- **alice** / password123 → Engineering
-- **bob** / password123 → Sales
-- **charlie** / password123 → HR
+- **mohit@aithinkers.com** / password123 → Engineering
+- **deepak@aithinkers.com** / password123 → Engineering
+- **karthik@aithinkers.com** / password123 → Sales
+- **swathi@aithinkers.com** / password123 → HR
 
-### Step 5: Generate and Ingest Sample Documents
+### Step 5: Add Documents
 
-Generate sample PDFs:
+**Quick start** - Add your own PDFs (see [DOCUMENT_MANAGEMENT.md](DOCUMENT_MANAGEMENT.md)):
 
 ```bash
-docker-compose exec backend python scripts/generate_test_pdfs.py
+# 1. Copy PDFs to documents/ folders
+cp ~/Downloads/*.pdf documents/engineering/
+
+# 2. Create config file
+cd backend
+nano my_documents.json
+
+# 3. Run ingestion
+python scripts/ingest_documents.py --batch my_documents.json
 ```
 
-Ingest documents into Qdrant:
+**Or use test PDFs** for demo:
 
 ```bash
-docker-compose exec backend python -m scripts.manage_db ingest
+# Generate sample test PDFs
+docker-compose exec backend python scripts/generate_test_pdfs.py
+
+# Then ingest using the script above
 ```
 
 ### Step 6: Start Frontend

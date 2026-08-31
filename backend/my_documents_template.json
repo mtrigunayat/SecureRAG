@@ -1,0 +1,28 @@
+[
+  {
+    "file_path": "../documents/engineering/YOUR_FILE_HERE.pdf",
+    "name": "Document Title Here",
+    "department": "engineering",
+    "sensitivity": "internal",
+    "_comment": "Valid departments: engineering, sales, hr, general"
+  },
+  {
+    "file_path": "../documents/sales/YOUR_FILE_HERE.pdf",
+    "name": "Document Title Here",
+    "department": "sales",
+    "sensitivity": "confidential",
+    "_comment": "Valid sensitivity: public, internal, confidential"
+  },
+  {
+    "file_path": "../documents/hr/YOUR_FILE_HERE.pdf",
+    "name": "Document Title Here",
+    "department": "hr",
+    "sensitivity": "internal"
+  },
+  {
+    "file_path": "../documents/general/YOUR_FILE_HERE.pdf",
+    "name": "Document Title Here",
+    "department": "general",
+    "sensitivity": "public"
+  }
+]
