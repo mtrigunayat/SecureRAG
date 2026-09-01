@@ -11,7 +11,7 @@ psycopg2-binary==2.9.9
 alembic==1.13.1
 
 # Qdrant
-qdrant-client==1.7.3
+qdrant-client==1.11.3
 
 # OpenAI (for future phases)
 openai==1.10.0
@@ -35,4 +35,4 @@ langchain-text-splitters==0.0.1
 reportlab==4.0.9  # For test PDF generation
 
 # Embeddings (Phase 7)
-sentence-transformers==2.3.1  # Local embeddings - no API cost
+sentence-transformers==2.7.0  # Local embeddings - no API cost
