@@ -8,5 +8,6 @@ Imports all SQLAlchemy models. Import order is important for relationships.
 from app.models.department import Department
 from app.models.user import User
 from app.models.document import Document
+from app.models.mcp_token import MCPToken
 
 __all__ = ["Department", "User", "Document"]

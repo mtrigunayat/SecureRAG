@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     jwt_algorithm: str = "HS256"
     jwt_expiration_hours: int = 1
     
+    # MCP Token Authentication (Phase 2)
+    mcp_token_expiration_days: int = 365  # 1 year default for long-lived MCP clients
+    
     # RAG Configuration (Phase 6)
     chunk_size: int = 600
     chunk_overlap: int = 100
