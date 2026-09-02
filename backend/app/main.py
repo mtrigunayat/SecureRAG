@@ -94,6 +94,10 @@ app.include_router(retrieval_router)
 from app.api.chat import router as chat_router
 app.include_router(chat_router)
 
+# Phase 3: MCP Server Internal Endpoints
+from app.api.mcp_internal import router as mcp_internal_router
+app.include_router(mcp_internal_router)
+
 
 @app.get("/")
 async def root():
