@@ -138,25 +138,40 @@ async def handle_mcp_request(
         method = body.get("method")
         params = body.get("params", {})
         
-        if not method:
-            return JSONResponse(
-                {
-                    "jsonrpc": "2.0",
-                    "id": request_id,
-                    "error": {
-                        "code": -32700,
-                        "message": "Parse error - missing method"
-                    }
-                },
-                status_code=400
-            )
+        # Check if this is a notification (no id field)
+        # Notifications don't expect responses
+        is_notification = "id" not in body
         
-        logger.info(f"MCP request: method={method} id={request_id}")
+        if not method:
+            # Notifications might not have all standard fields, so only error on real requests
+            if not is_notification:
+                return JSONResponse(
+                    {
+                        "jsonrpc": "2.0",
+                        "id": request_id,
+                        "error": {
+                            "code": -32700,
+                            "message": "Parse error - missing method"
+                        }
+                    },
+                    status_code=400
+                )
+            else:
+                # Notification with no method - ignore silently
+                return JSONResponse({}, status_code=200)
+        
+        logger.info(f"MCP request: method={method} id={request_id} (notification={is_notification})")
         
         # Dispatch through MCP Server's request handlers
         try:
             # Look up handler for this method
             if method not in server.request_handlers:
+                # If it's a notification, silently ignore unknown methods
+                if is_notification:
+                    logger.debug(f"Ignoring unknown notification: {method}")
+                    return JSONResponse({}, status_code=200)
+                
+                # For requests, return proper error
                 return JSONResponse(
                     {
                         "jsonrpc": "2.0",
@@ -217,7 +232,11 @@ async def handle_mcp_request(
             
             logger.debug(f"MCP response: {method} -> success")
             
-            # Return MCP JSON-RPC response
+            # For notifications, don't send a response (per MCP spec)
+            if is_notification:
+                return JSONResponse({}, status_code=200)
+            
+            # Return MCP JSON-RPC response for requests
             return JSONResponse({
                 "jsonrpc": "2.0",
                 "id": request_id,
