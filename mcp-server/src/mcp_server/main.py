@@ -133,24 +133,24 @@ async def login_api_handler(request: Request):
     """
     API endpoint for login form to authenticate users.
     
-    Receives: POST with {username, password}
+    Receives: POST with {email, password}
     Returns: JSON with {success, message, mcp_token, user_id, username, department}
     """
     from starlette.responses import JSONResponse
     
     try:
         data = await request.json()
-        username = data.get("username", "").strip()
+        email = data.get("email", "").strip()
         password = data.get("password", "").strip()
         
-        if not username or not password:
+        if not email or not password:
             return JSONResponse({
                 "success": False,
-                "message": "Username and password required"
+                "message": "Email and password required"
             }, status_code=400)
         
         # Authenticate user
-        result = await authenticate_user(username, password)
+        result = await authenticate_user(email, password)
         
         if result.success:
             return JSONResponse(result.model_dump(), status_code=200)

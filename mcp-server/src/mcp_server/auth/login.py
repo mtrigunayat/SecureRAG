@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 class LoginRequest(BaseModel):
     """User login credentials"""
-    username: str
+    email: str
     password: str
 
 
@@ -39,7 +39,7 @@ class LoginResponse(BaseModel):
     department: Optional[str] = None
 
 
-async def authenticate_user(username: str, password: str) -> LoginResponse:
+async def authenticate_user(email: str, password: str) -> LoginResponse:
     """
     Authenticate user against backend and return MCP token.
     
@@ -47,33 +47,49 @@ async def authenticate_user(username: str, password: str) -> LoginResponse:
     then generates an MCP token for the authenticated user.
     
     Args:
-        username: User's username
+        email: User's email
         password: User's password
         
     Returns:
         LoginResponse with MCP token if successful
     """
     try:
-        # Call backend login endpoint
+        # Call backend login endpoint with email and password
         async with httpx.AsyncClient(timeout=settings.backend_timeout) as client:
-            response = await client.post(
+            login_response = await client.post(
                 f"{settings.backend_url}/api/auth/login",
                 json={
-                    "username": username,
+                    "email": email,
                     "password": password
                 }
             )
             
-            if response.status_code != 200:
+            if login_response.status_code != 200:
                 return LoginResponse(
                     success=False,
                     message="Invalid username or password"
                 )
             
-            auth_data = response.json()
-            user_id = auth_data.get("user_id")
-            username_returned = auth_data.get("username")
-            department = auth_data.get("department")
+            # Get the JWT token from login response
+            login_data = login_response.json()
+            access_token = login_data.get("access_token")
+            
+            # Call /api/auth/me to get user info using the JWT
+            me_response = await client.get(
+                f"{settings.backend_url}/api/auth/me",
+                headers={"Authorization": f"Bearer {access_token}"}
+            )
+            
+            if me_response.status_code != 200:
+                return LoginResponse(
+                    success=False,
+                    message="Failed to retrieve user information"
+                )
+            
+            user_data = me_response.json()
+            user_id = user_data.get("id")
+            username_returned = user_data.get("username")
+            department = user_data.get("department")
             
             # Now generate MCP token for this user
             token = await generate_mcp_token(user_id, username_returned)
