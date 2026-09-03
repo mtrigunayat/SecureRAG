@@ -108,6 +108,37 @@ export function ChatSidebar() {
               </p>
             </div>
           </div>
+
+          {/* MCP Server Integration Info */}
+          <div className="sidebar-section mcp-info-section">
+            <h3 className="sidebar-title">🔌 MCP Server Capabilities</h3>
+            <div className="mcp-features">
+              <div className="mcp-feature-item">
+                <span className="mcp-feature-icon">🚀</span>
+                <div className="mcp-feature-text">
+                  <div className="mcp-feature-title">Integration Ready</div>
+                  <div className="mcp-feature-description">Connect with external AI models</div>
+                </div>
+              </div>
+              <div className="mcp-feature-item">
+                <span className="mcp-feature-icon">🔑</span>
+                <div className="mcp-feature-text">
+                  <div className="mcp-feature-title">Token Management</div>
+                  <div className="mcp-feature-description">Secure API access control</div>
+                </div>
+              </div>
+              <div className="mcp-feature-item">
+                <span className="mcp-feature-icon">⚙️</span>
+                <div className="mcp-feature-text">
+                  <div className="mcp-feature-title">Automation</div>
+                  <div className="mcp-feature-description">Workflow automation & webhooks</div>
+                </div>
+              </div>
+            </div>
+            <div className="mcp-info-note">
+              ℹ️ This system now supports Model Context Protocol (MCP) server integration for enterprise automation and external AI model connections.
+            </div>
+          </div>
         </div>
       )}
     </aside>

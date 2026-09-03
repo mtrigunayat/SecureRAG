@@ -509,6 +509,252 @@
   font-weight: bold;
 }
 
+/* MCP Server Integration Section */
+.mcp-section {
+  padding: 4rem 2rem;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  border-radius: 24px;
+  margin-bottom: 3rem;
+  border: 2px solid rgba(102, 126, 234, 0.3);
+  backdrop-filter: blur(10px);
+  position: relative;
+  overflow: hidden;
+}
+
+.mcp-section::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+  z-index: 0;
+}
+
+.mcp-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+.mcp-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0.5rem 1rem;
+  border-radius: 24px;
+  margin-bottom: 1.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  animation: slideInLeft 0.6s ease-out;
+}
+
+.mcp-label {
+  color: white;
+}
+
+.section-subtitle {
+  text-align: center;
+  font-size: 1.15rem;
+  opacity: 0.9;
+  max-width: 700px;
+  margin: 0 auto 3rem;
+  color: rgba(255, 255, 255, 0.9);
+  animation: fadeInUp 0.6s ease-out 0.2s backwards;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.mcp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.mcp-card {
+  background: rgba(255, 255, 255, 0.12);
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: fadeInUp 0.6s ease-out backwards;
+  position: relative;
+  overflow: hidden;
+}
+
+.mcp-card:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.mcp-card:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.mcp-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.mcp-card:nth-child(4) {
+  animation-delay: 0.5s;
+}
+
+.mcp-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 0;
+}
+
+.mcp-card:hover {
+  transform: translateY(-10px) scale(1.02);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.2);
+}
+
+.mcp-card:hover::before {
+  opacity: 1;
+}
+
+.mcp-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.mcp-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  display: inline-block;
+  animation: rotate 20s linear infinite;
+}
+
+.mcp-card h3 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.75rem;
+}
+
+.mcp-card p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin: 0 0 1rem;
+}
+
+.mcp-feature {
+  display: inline-block;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+  margin: 0.3rem 0.3rem 0.3rem 0;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.mcp-benefits {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 3rem 2rem;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  animation: fadeInUp 0.6s ease-out 0.3s backwards;
+}
+
+.mcp-benefits h3 {
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 2.5rem;
+  background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.8) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.benefits-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.benefit-box {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.3s ease;
+  animation: slideInLeft 0.6s ease-out backwards;
+}
+
+.benefit-box:nth-child(1) {
+  animation-delay: 0.35s;
+}
+
+.benefit-box:nth-child(2) {
+  animation-delay: 0.45s;
+}
+
+.benefit-box:nth-child(3) {
+  animation-delay: 0.55s;
+}
+
+.benefit-box:nth-child(4) {
+  animation-delay: 0.65s;
+}
+
+.benefit-box:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(8px);
+}
+
+.benefit-number {
+  flex-shrink: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #667eea;
+  opacity: 0.7;
+}
+
+.benefit-content h4 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: white;
+  margin: 0 0 0.5rem;
+}
+
+.benefit-content p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgba(255, 255, 255, 0.85);
+  margin: 0;
+}
+
 /* CTA Section */
 .cta-section {
   text-align: center;

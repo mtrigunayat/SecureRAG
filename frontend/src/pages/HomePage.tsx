@@ -210,6 +210,88 @@ export function HomePage() {
           </div>
         </section>
 
+        {/* MCP Server Integration Section */}
+        <section className="mcp-section">
+          <div className="mcp-badge">
+            <span className="mcp-label">NEW</span>
+          </div>
+          <h2 className="section-title">MCP Server Integration</h2>
+          <p className="section-subtitle">
+            Advanced Model Context Protocol (MCP) support for external AI integrations and automation
+          </p>
+          
+          <div className="mcp-grid">
+            <div className="mcp-card">
+              <div className="mcp-icon">🔌</div>
+              <h3>Seamless Integration</h3>
+              <p>Connect external AI models and tools through our standardized MCP server interface.</p>
+              <div className="mcp-feature">✓ JSON-RPC Communication</div>
+              <div className="mcp-feature">✓ Protocol Buffers Support</div>
+            </div>
+
+            <div className="mcp-card">
+              <div className="mcp-icon">🔑</div>
+              <h3>Secure Token Management</h3>
+              <p>Generate and manage API tokens for external integrations with full audit trails.</p>
+              <div className="mcp-feature">✓ Rate Limiting</div>
+              <div className="mcp-feature">✓ Token Revocation</div>
+            </div>
+
+            <div className="mcp-card">
+              <div className="mcp-icon">🚀</div>
+              <h3>Enterprise Automation</h3>
+              <p>Automate knowledge management workflows with external applications and services.</p>
+              <div className="mcp-feature">✓ Webhook Support</div>
+              <div className="mcp-feature">✓ Async Processing</div>
+            </div>
+
+            <div className="mcp-card">
+              <div className="mcp-icon">📊</div>
+              <h3>Advanced Analytics</h3>
+              <p>Monitor integration usage and performance metrics through comprehensive dashboards.</p>
+              <div className="mcp-feature">✓ Usage Tracking</div>
+              <div className="mcp-feature">✓ Performance Metrics</div>
+            </div>
+          </div>
+
+          <div className="mcp-benefits">
+            <h3>Benefits of MCP Server Integration</h3>
+            <div className="benefits-list">
+              <div className="benefit-box">
+                <span className="benefit-number">01</span>
+                <div className="benefit-content">
+                  <h4>Extended Capabilities</h4>
+                  <p>Integrate with third-party AI models and tools without modifying core infrastructure</p>
+                </div>
+              </div>
+
+              <div className="benefit-box">
+                <span className="benefit-number">02</span>
+                <div className="benefit-content">
+                  <h4>Custom Workflows</h4>
+                  <p>Build automated workflows that connect Secure RAG with your existing tools</p>
+                </div>
+              </div>
+
+              <div className="benefit-box">
+                <span className="benefit-number">03</span>
+                <div className="benefit-content">
+                  <h4>Scalable Solutions</h4>
+                  <p>Scale your knowledge management across departments and external systems</p>
+                </div>
+              </div>
+
+              <div className="benefit-box">
+                <span className="benefit-number">04</span>
+                <div className="benefit-content">
+                  <h4>Security First</h4>
+                  <p>Enterprise-grade security with department-level access control throughout</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Benefits Section */}
         <section className="benefits-section">
           <h2 className="section-title">Why Choose Secure RAG?</h2>

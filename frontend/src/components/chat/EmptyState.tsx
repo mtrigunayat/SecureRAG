@@ -49,6 +49,18 @@ export function EmptyState({ onSuggestionClick }: EmptyStateProps) {
           </div>
         </div>
 
+        <div className="mcp-info-banner">
+          <div className="mcp-banner-content">
+            <span className="mcp-banner-icon">🔌</span>
+            <div className="mcp-banner-text">
+              <div className="mcp-banner-title">MCP Server Integration Enabled</div>
+              <div className="mcp-banner-description">
+                This system now supports Model Context Protocol (MCP) for seamless integration with external AI models and enterprise automation tools.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="suggestions">
           <p className="suggestions-label">Try asking:</p>
           <div className="suggestions-grid">
