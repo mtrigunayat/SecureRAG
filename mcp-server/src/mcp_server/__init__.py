@@ -17,10 +17,11 @@ Architecture:
 import asyncio
 from contextlib import asynccontextmanager
 from contextvars import ContextVar
+from typing import Optional
 
 from mcp.server import Server
 import mcp.types as types
-from mcp import MCPError
+from mcp import McpError
 
 from mcp_server.core.config import settings
 from mcp_server.core.logging import get_logger
@@ -39,22 +40,21 @@ logger = get_logger(__name__)
 _server: Server = None
 _backend_client: BackendAPIClient = None
 
-# Handler function references (populated by create_app)
-_handle_list_tools_fn = None
-_handle_call_tool_fn = None
-
 # Request-scoped context for authenticated user (async-safe)
-_auth_context: ContextVar[AuthenticatedContext] = ContextVar('auth_context', default=None)
+_auth_context: ContextVar[Optional[AuthenticatedContext]] = ContextVar('auth_context', default=None)
 
 
 def create_app() -> Server:
     """
     Create and configure the MCP server.
     
+    This creates the official MCP Server using the SDK, and registers
+    handlers for MCP requests (initialize, tools/list, tools/call).
+    
     Returns:
         Configured MCP Server instance
     """
-    global _server, _backend_client, _handle_list_tools_fn, _handle_call_tool_fn
+    global _server, _backend_client
     
     server = Server("secure-rag-mcp")
     _backend_client = BackendAPIClient()
@@ -62,9 +62,39 @@ def create_app() -> Server:
     logger.info(f"MCP Server initialized: {server.name}")
     logger.info(f"Backend URL: {settings.backend_url}")
     
-    # Define request handlers
+    # Initialize handler - called by MCP clients to discover server capabilities
+    async def handle_initialize(request: types.InitializeRequest) -> types.InitializeResult:
+        """
+        Handle MCP initialize request.
+        
+        This is the first request from any MCP client and doesn't require authentication.
+        Returns server capabilities and protocol version.
+        """
+        logger.info(f"MCP initialize request from client: {request.params.clientInfo.name}")
+        
+        return types.InitializeResult(
+            protocolVersion="2024-11-05",  # MCP protocol version
+            capabilities=types.ServerCapabilities(
+                tools=types.ToolsCapability(
+                    listChanged=False
+                ),
+                resources=None,
+                prompts=None,
+            ),
+            serverInfo=types.Implementation(
+                name="secure-rag-mcp",
+                version="0.2.0"
+            ),
+        )
+    
+    # Tools list handler
     async def handle_list_tools(request: types.ListToolsRequest) -> types.ListToolsResult:
-        """List available tools."""
+        """
+        List available tools.
+        
+        This handler returns the list of tools available to the client.
+        Requires authentication via Authorization header.
+        """
         return types.ListToolsResult(
             tools=[
                 types.Tool(
@@ -93,30 +123,35 @@ def create_app() -> Server:
             ]
         )
     
+    # Tool call handler
     async def handle_call_tool(
         request: types.CallToolRequest
     ) -> types.CallToolResult:
         """
         Execute a tool.
         
-        The authenticated user context is stored in _auth_context
-        and is available for tool execution.
+        The authenticated user context is stored in the transport layer
+        and available through the ContextVar.
+        
+        Requires authentication via Authorization header.
         """
-        if request.name != "ask_knowledge_base":
-            raise MCPError(f"Unknown tool: {request.name}")
+        if request.params.name != "ask_knowledge_base":
+            raise McpError(f"Unknown tool: {request.params.name}")
         
         # Extract parameters
-        question = request.arguments.get("question", "").strip()
+        question = request.params.arguments.get("question", "").strip()
         if not question:
-            raise MCPError("Question is required")
+            raise McpError("Question is required")
         
         # Get authenticated context from context variable
-        auth_context: AuthenticatedContext = _auth_context.get()
+        # (set by transport layer during authentication)
+        from mcp_server.transport import get_auth_context
+        auth_context: Optional[AuthenticatedContext] = get_auth_context()
         
         if not auth_context:
-            raise MCPError("Authentication context not found (internal error)")
+            raise McpError("Authentication context not found (internal error)")
         
-        logger.info(f"Tool call: {request.name} | user_id={auth_context.user_id}")
+        logger.info(f"Tool call: {request.params.name} | user_id={auth_context.user_id}")
         
         try:
             # Call tool implementation
@@ -144,13 +179,10 @@ def create_app() -> Server:
                 isError=True
             )
     
-    # Register handlers with the server using MCP 2.1.1 API
-    server.add_request_handler("tools/list", types.RequestParams, handle_list_tools)
-    server.add_request_handler("tools/call", types.CallToolRequestParams, handle_call_tool)
-    
-    # Store handler references for direct access in HTTP transport
-    _handle_list_tools_fn = handle_list_tools
-    _handle_call_tool_fn = handle_call_tool
+    # Register handlers using the request_handlers dict
+    server.request_handlers["initialize"] = (handle_initialize, types.InitializeRequest)
+    server.request_handlers["tools/list"] = (handle_list_tools, types.ListToolsRequest)
+    server.request_handlers["tools/call"] = (handle_call_tool, types.CallToolRequest)
     
     _server = server
     return server

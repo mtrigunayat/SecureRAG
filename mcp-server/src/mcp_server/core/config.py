@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     # MCP Server
     mcp_host: str = "0.0.0.0"
     mcp_port: int = 5000  # Overridden by PORT environment variable if set
+    mcp_public_url: str = "http://localhost:5000"  # Public URL for OAuth discovery
     
     # Backend
     backend_url: str = "http://localhost:8000"  # Must be set to deployed backend URL in production

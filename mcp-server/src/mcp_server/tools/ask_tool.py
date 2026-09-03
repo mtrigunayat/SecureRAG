@@ -52,16 +52,14 @@ async def ask_knowledge_base_impl(
     
     try:
         # Call backend with authenticated JWT
-        response = await backend_client.ask_knowledge_base(
+        chat_response = await backend_client.ask_knowledge_base(
             question=question,
             backend_jwt=auth_context.backend_jwt
         )
         
-        # Build formatted response
-        answer = response.get("answer", "")
-        sources = response.get("sources", [])
-        retrieved_count = response.get("retrieved_count", 0)
-        user_dept = response.get("user_department_name", "")
+        # Extract data from ChatResponse object
+        answer = chat_response.answer
+        sources = chat_response.sources
         
         # Format with sources
         formatted = f"{answer}\n"
@@ -69,18 +67,12 @@ async def ask_knowledge_base_impl(
         if sources:
             formatted += "\n**Sources:**\n"
             for idx, source in enumerate(sources, 1):
-                doc_name = source.get("document_name", "Unknown")
-                dept = source.get("department_name", "Unknown")
-                score = source.get("score", 0)
-                page_start = source.get("page_start", "?")
-                page_end = source.get("page_end", "?")
-                
                 formatted += (
-                    f"{idx}. **{doc_name}** ({dept}) "
-                    f"[p.{page_start}-{page_end}, score: {score:.2f}]\n"
+                    f"{idx}. **{source.document_name}** "
+                    f"[{source.sensitivity}]\n"
                 )
         
-        formatted += f"\n_Retrieved {retrieved_count} document(s) from {user_dept}_"
+        formatted += f"\n_Retrieved {len(sources)} document(s)_"
         
         logger.info(f"Tool completed: ask_knowledge_base | sources={len(sources)}")
         return formatted
