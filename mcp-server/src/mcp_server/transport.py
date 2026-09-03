@@ -304,11 +304,16 @@ async def mcp_endpoint(
                     # No Bearer token provided - create demo/anonymous context
                     # This allows Claude to connect without pre-configured tokens
                     from mcp_server.auth import AuthenticatedContext
-                    auth_context = AuthenticatedContext(
-                        user_id=1,  # Default user (usually "Engineering" dept)
-                        username="claude_demo",
-                        department_name="Engineering"
-                    )
+                    from mcp_server.auth.token_service import MCPTokenResponse
+                    
+                    demo_response = MCPTokenResponse({
+                        "user_id": 1,
+                        "username": "claude_demo",
+                        "department_name": "Engineering",
+                        "backend_jwt": "demo_jwt_token",
+                        "expires_in": 3600
+                    })
+                    auth_context = AuthenticatedContext(demo_response)
                     _auth_context.set(auth_context)
                     logger.info(f"MCP request without auth - using demo context: {auth_context.username}")
             except AuthenticationError as e:
