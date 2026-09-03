@@ -316,25 +316,34 @@ async def mcp_endpoint(
             logger.info("MCP initialize request (no auth required)")
         else:
             # For all other methods, try to authenticate
-            # If no Bearer token is provided, use a default "demo" user for testing
+            # If no Bearer token is provided, try POC authentication (uses env var credentials)
             try:
                 auth_context = await authenticate_from_header(request)
                 if auth_context is None:
-                    # No Bearer token provided - create demo/anonymous context
-                    # This allows Claude to connect without pre-configured tokens
-                    from mcp_server.auth import AuthenticatedContext
-                    from mcp_server.auth.token_service import MCPTokenResponse
-                    
-                    demo_response = MCPTokenResponse({
-                        "user_id": 1,
-                        "username": "claude_demo",
-                        "department_name": "Engineering",
-                        "backend_jwt": "demo_jwt_token",
-                        "expires_in": 3600
-                    })
-                    auth_context = AuthenticatedContext(demo_response)
-                    _auth_context.set(auth_context)
-                    logger.info(f"MCP request without auth - using demo context: {auth_context.username}")
+                    # No Bearer token provided
+                    # Try POC authentication using stored credentials
+                    from mcp_server.auth import get_poc_auth_context
+                    try:
+                        auth_context = await get_poc_auth_context()
+                        _auth_context.set(auth_context)
+                        logger.info(f"MCP request: POC authentication for {auth_context.username}")
+                    except Exception as e:
+                        # POC auth also failed - this is expected if POC creds not configured
+                        logger.debug(f"POC authentication not available: {e}")
+                        # Fall back to demo context for backward compatibility
+                        from mcp_server.auth import AuthenticatedContext
+                        from mcp_server.auth.token_service import MCPTokenResponse
+                        
+                        demo_response = MCPTokenResponse({
+                            "user_id": 1,
+                            "username": "claude_demo",
+                            "department_name": "Engineering",
+                            "backend_jwt": "demo_jwt_token",
+                            "expires_in": 3600
+                        })
+                        auth_context = AuthenticatedContext(demo_response)
+                        _auth_context.set(auth_context)
+                        logger.info(f"MCP request: using demo context (POC creds not available)")
             except AuthenticationError as e:
                 logger.warning(f"Authentication failed: {e.message}")
                 return JSONResponse(
