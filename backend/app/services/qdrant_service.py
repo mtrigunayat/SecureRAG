@@ -127,6 +127,41 @@ class QdrantService:
                     f"size={vector_size}, distance={distance}"
                 )
                 
+                # Create payload indexes for filtering (required for Qdrant Cloud)
+                # These indexes are necessary for filtering by department_id
+                try:
+                    self.client.create_payload_index(
+                        collection_name=collection_name,
+                        field_name="department_id",
+                        field_schema="integer"
+                    )
+                    logger.info(
+                        f"Created payload index for 'department_id' "
+                        f"in collection '{collection_name}'"
+                    )
+                except Exception as index_error:
+                    logger.warning(
+                        f"Failed to create payload index for 'department_id': "
+                        f"{index_error}. Filtering may be slow or fail in Qdrant Cloud."
+                    )
+                
+                # Also index document_id for deletion operations
+                try:
+                    self.client.create_payload_index(
+                        collection_name=collection_name,
+                        field_name="document_id",
+                        field_schema="integer"
+                    )
+                    logger.info(
+                        f"Created payload index for 'document_id' "
+                        f"in collection '{collection_name}'"
+                    )
+                except Exception as index_error:
+                    logger.warning(
+                        f"Failed to create payload index for 'document_id': "
+                        f"{index_error}"
+                    )
+                
         except VectorDBError:
             raise
         except Exception as e:
