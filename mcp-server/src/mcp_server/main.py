@@ -6,24 +6,21 @@ Starts the MCP server with proper Streamable HTTP transport using the official M
 The server exposes:
 - Health check: GET /health → {"status":"healthy"}
 - MCP endpoint: POST /mcp → Streamable HTTP MCP transport
-- OAuth discovery: GET /.well-known/oauth-authorization-server
-- OAuth token endpoint: POST /oauth/token
-- OAuth authorization: GET /oauth/authorize
 
 Authentication:
-  - MCP clients include Authorization: Bearer <mcp_token> header
-  - Server validates token with backend
-  - Backend returns authenticated user info + short-lived JWT
-  - Server uses JWT for backend API calls
+  - Uses hardcoded POC credentials (for testing)
+  - Automatically authenticates with backend
+  - Creates MCP token on each request
+  - All requests use authenticated context
   
 Lifecycle:
-  1. Client connects
-  2. Client sends initialize request (no auth required)
-  3. Server returns capabilities + protocol version
-  4. Client sends tools/list (requires auth)
-  5. Server validates token, loads user, returns tools
-  6. Client sends tools/call (requires auth)
-  7. Server validates token, executes tool, returns result
+  1. Client connects to /mcp
+  2. Server auto-authenticates using POC credentials
+  3. Server creates MCP token from backend
+  4. Client sends initialize request
+  5. Server returns capabilities + protocol version
+  6. Client sends tools/list, tools/call, etc.
+  7. Server executes with authenticated context
 """
 import asyncio
 import sys
@@ -41,15 +38,6 @@ from mcp_server.core.config import settings
 from mcp_server.core.logging import get_logger
 from mcp_server import create_app
 from mcp_server.transport import mcp_endpoint, _auth_context
-from mcp_server.oauth import (
-    oauth_authorization_server_metadata,
-    oauth_authorize,
-    oauth_token
-)
-from mcp_server.auth.login import (
-    authenticate_user,
-    get_login_html
-)
 
 logger = get_logger(__name__)
 
@@ -100,71 +88,6 @@ async def mcp_endpoint_handler(request: Request):
         _auth_context.set(None)
 
 
-async def oauth_metadata_handler(request: Request):
-    """OAuth authorization server metadata endpoint."""
-    return await oauth_authorization_server_metadata(request)
-
-
-async def oauth_authorize_handler(request: Request):
-    """OAuth authorization endpoint."""
-    return await oauth_authorize(request)
-
-
-async def oauth_token_handler(request: Request):
-    """OAuth token endpoint."""
-    return await oauth_token(request)
-
-
-async def login_page_handler(request: Request):
-    """
-    Serve login page for users to authenticate and get MCP tokens.
-    
-    This page allows users to:
-    1. Enter their credentials
-    2. Get authenticated
-    3. Receive an MCP token
-    4. Copy token for Claude MCP configuration
-    """
-    from starlette.responses import HTMLResponse
-    return HTMLResponse(get_login_html())
-
-
-async def login_api_handler(request: Request):
-    """
-    API endpoint for login form to authenticate users.
-    
-    Receives: POST with {email, password}
-    Returns: JSON with {success, message, mcp_token, user_id, username, department}
-    """
-    from starlette.responses import JSONResponse
-    
-    try:
-        data = await request.json()
-        email = data.get("email", "").strip()
-        password = data.get("password", "").strip()
-        
-        if not email or not password:
-            return JSONResponse({
-                "success": False,
-                "message": "Email and password required"
-            }, status_code=400)
-        
-        # Authenticate user
-        result = await authenticate_user(email, password)
-        
-        if result.success:
-            return JSONResponse(result.model_dump(), status_code=200)
-        else:
-            return JSONResponse(result.model_dump(), status_code=401)
-    
-    except Exception as e:
-        logger.error(f"Login API error: {e}", exc_info=True)
-        return JSONResponse({
-            "success": False,
-            "message": "Server error during authentication"
-        }, status_code=500)
-
-
 async def run_mcp_server():
     """
     Run MCP server with Streamable HTTP transport (Starlette + Uvicorn).
@@ -173,11 +96,14 @@ async def run_mcp_server():
     1. Listens on configured host:port
     2. Exposes health endpoint
     3. Exposes MCP protocol endpoint
-    4. Exposes OAuth discovery and token endpoints
-    5. Uses Uvicorn ASGI server
+    4. Uses Uvicorn ASGI server
     
-    The server implements the official MCP Streamable HTTP transport
-    and OAuth 2.1 authorization for Claude Custom Remote Connector support.
+    The server implements the official MCP Streamable HTTP transport.
+    
+    Authentication:
+    - MCP clients authenticate using POC credentials (hardcoded for testing)
+    - Server automatically creates MCP token from backend
+    - All requests use authenticated context
     """
     logger.info("=" * 70)
     logger.info("MCP Server Starting with Streamable HTTP Transport")
@@ -188,13 +114,10 @@ async def run_mcp_server():
     logger.info(f"Log Level: {settings.log_level}")
     logger.info("=" * 70)
     logger.info("Endpoints:")
-    logger.info(f"  Health:        GET /health")
-    logger.info(f"  Login Page:    GET /auth/login")
-    logger.info(f"  Login API:     POST /auth/login-api")
-    logger.info(f"  MCP:           POST /mcp")
-    logger.info(f"  OAuth Metadata GET /.well-known/oauth-authorization-server")
-    logger.info(f"  OAuth Authorize GET /oauth/authorize")
-    logger.info(f"  OAuth Token:   POST /oauth/token")
+    logger.info(f"  Health:  GET /health")
+    logger.info(f"  MCP:     POST /mcp")
+    logger.info("=" * 70)
+    logger.info("POC Authentication: Using hardcoded credentials")
     logger.info("=" * 70)
     
     # Create Starlette application with routes
@@ -205,19 +128,6 @@ async def run_mcp_server():
             
             # MCP Streamable HTTP endpoint
             Route("/mcp", mcp_endpoint_handler, methods=["POST"]),
-            
-            # Authentication & Token Management
-            Route("/auth/login", login_page_handler, methods=["GET"]),
-            Route("/auth/login-api", login_api_handler, methods=["POST"]),
-            
-            # OAuth endpoints
-            Route(
-                "/.well-known/oauth-authorization-server",
-                oauth_metadata_handler,
-                methods=["GET"]
-            ),
-            Route("/oauth/authorize", oauth_authorize_handler, methods=["GET"]),
-            Route("/oauth/token", oauth_token_handler, methods=["POST"]),
         ],
     )
     

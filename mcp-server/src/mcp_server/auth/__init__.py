@@ -72,14 +72,15 @@ async def validate_mcp_token(raw_token: str) -> AuthenticatedContext:
 
 async def get_poc_auth_context() -> AuthenticatedContext:
     """
-    POC: Get authenticated context using stored credentials.
+    POC: Get authenticated context using hardcoded credentials.
     
-    For proof-of-concept testing, this authenticates using credentials
-    stored in environment variables (POC_USER_EMAIL, POC_USER_PASSWORD)
-    instead of requiring a Bearer token.
+    For proof-of-concept testing, this authenticates using hardcoded credentials
+    for immediate testing without environment variable configuration.
+    
+    Production: Replace with proper OAuth or token management.
     
     Flow:
-    1. Get email/password from env vars
+    1. Use hardcoded email/password
     2. Call backend /api/auth/login
     3. Call backend /api/auth/me to get user info
     4. Call backend /api/internal/mcp/create-token to get MCP token
@@ -89,13 +90,11 @@ async def get_poc_auth_context() -> AuthenticatedContext:
         AuthenticatedContext with user identity
         
     Raises:
-        AuthenticationError: If credentials invalid or backend error
+        AuthenticationError: If backend error
     """
-    # Check if POC credentials are configured
-    if not settings.poc_user_email or not settings.poc_user_password:
-        raise AuthenticationError(
-            "POC credentials not configured in .env (POC_USER_EMAIL, POC_USER_PASSWORD)"
-        )
+    # Hardcoded POC credentials (for testing only)
+    poc_email = "mohit@aithinkers.com"
+    poc_password = "password123"
     
     try:
         async with httpx.AsyncClient(timeout=settings.backend_timeout) as client:
@@ -103,8 +102,8 @@ async def get_poc_auth_context() -> AuthenticatedContext:
             login_response = await client.post(
                 f"{settings.backend_url}/api/auth/login",
                 json={
-                    "email": settings.poc_user_email,
-                    "password": settings.poc_user_password
+                    "email": poc_email,
+                    "password": poc_password
                 }
             )
             

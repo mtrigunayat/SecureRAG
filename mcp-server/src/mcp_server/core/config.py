@@ -35,10 +35,6 @@ class Settings(BaseSettings):
     backend_api_timeout: int = 30
     backend_timeout: int = 30  # Alias for backend_api_timeout
     
-    # POC: Auto-authentication with backend
-    poc_user_email: Optional[str] = None
-    poc_user_password: Optional[str] = None
-    
     # Internal Service Key (for token generation)
     internal_service_key: Optional[str] = None
     
