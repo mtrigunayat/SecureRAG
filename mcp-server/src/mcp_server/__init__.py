@@ -58,9 +58,8 @@ def create_app() -> Server:
     logger.info(f"MCP Server initialized: {server.name}")
     logger.info(f"Backend URL: {settings.backend_url}")
     
-    # Register request handlers
-    @server.add_request_handler(types.ListToolsRequest)
-    async def handle_list_tools() -> types.ListToolsResult:
+    # Define request handlers
+    async def handle_list_tools(request: types.ListToolsRequest) -> types.ListToolsResult:
         """List available tools."""
         return types.ListToolsResult(
             tools=[
@@ -90,7 +89,6 @@ def create_app() -> Server:
             ]
         )
     
-    @server.add_request_handler(types.CallToolRequest)
     async def handle_call_tool(
         request: types.CallToolRequest
     ) -> types.CallToolResult:
@@ -141,6 +139,10 @@ def create_app() -> Server:
                 content=[types.TextContent(type="text", text=f"Tool execution failed: {str(e)}")],
                 isError=True
             )
+    
+    # Register handlers with the server using MCP 2.1.1 API
+    server.add_request_handler("tools/list", types.RequestParams, handle_list_tools)
+    server.add_request_handler("tools/call", types.CallToolRequestParams, handle_call_tool)
     
     _server = server
     return server

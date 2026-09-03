@@ -49,7 +49,13 @@ def main():
     print("=" * 60)
     
     os.chdir(script_dir)
-    subprocess.run([str(python_exe), "-m", "mcp_server.main"])
+    env = os.environ.copy()
+    src_dir = script_dir / "src"
+    if "PYTHONPATH" in env:
+        env["PYTHONPATH"] = f"{src_dir}:{env['PYTHONPATH']}"
+    else:
+        env["PYTHONPATH"] = str(src_dir)
+    subprocess.run([str(python_exe), "-m", "mcp_server.main"], env=env)
 
 if __name__ == "__main__":
     main()
