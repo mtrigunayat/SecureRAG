@@ -294,25 +294,6 @@
 /* Responsive */
 @media (max-width: 768px) {
   .chat-sidebar {
-    width: 100%;
-    max-height: 200px;
-    border-right: none;
-    border-bottom: 2px solid #e2e8f0;
-  }
-
-  .chat-sidebar.collapsed {
-    max-height: 60px;
-    width: 100%;
-  }
-
-  .sidebar-toggle {
-    top: auto;
-    bottom: -12px;
-    right: 50%;
-    transform: translateX(50%) rotate(90deg);
-  }
-
-  .sidebar-toggle:hover {
-    transform: translateX(50%) rotate(90deg) scale(1.1);
+    display: none;
   }
 }
