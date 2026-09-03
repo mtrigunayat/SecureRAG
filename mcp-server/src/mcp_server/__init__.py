@@ -39,6 +39,10 @@ logger = get_logger(__name__)
 _server: Server = None
 _backend_client: BackendAPIClient = None
 
+# Handler function references (populated by create_app)
+_handle_list_tools_fn = None
+_handle_call_tool_fn = None
+
 # Request-scoped context for authenticated user (async-safe)
 _auth_context: ContextVar[AuthenticatedContext] = ContextVar('auth_context', default=None)
 
@@ -50,7 +54,7 @@ def create_app() -> Server:
     Returns:
         Configured MCP Server instance
     """
-    global _server, _backend_client
+    global _server, _backend_client, _handle_list_tools_fn, _handle_call_tool_fn
     
     server = Server("secure-rag-mcp")
     _backend_client = BackendAPIClient()
@@ -143,6 +147,10 @@ def create_app() -> Server:
     # Register handlers with the server using MCP 2.1.1 API
     server.add_request_handler("tools/list", types.RequestParams, handle_list_tools)
     server.add_request_handler("tools/call", types.CallToolRequestParams, handle_call_tool)
+    
+    # Store handler references for direct access in HTTP transport
+    _handle_list_tools_fn = handle_list_tools
+    _handle_call_tool_fn = handle_call_tool
     
     _server = server
     return server

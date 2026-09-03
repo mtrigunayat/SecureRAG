@@ -27,6 +27,7 @@ from starlette.requests import Request
 from mcp_server.core.config import settings
 from mcp_server.core.logging import get_logger
 from mcp_server import create_app, health_check
+import mcp_server as mcp_server_module
 
 logger = get_logger(__name__)
 
@@ -90,23 +91,15 @@ async def mcp_endpoint(request: Request):
         
         logger.info(f"MCP request: {method}")
         
-        # Route to appropriate handler
-        # Try to access handlers from the MCP server
-        try:
-            handlers = getattr(_mcp_server, "_request_handlers", {})
-            if not handlers:
-                # Fallback: try other possible attribute names
-                handlers = getattr(_mcp_server, "request_handlers", {})
-        except Exception:
-            handlers = {}
+        # Get handler functions from module (populated by create_app)
         
         if method == "tools/list":
             try:
                 from mcp import types
                 list_request = types.ListToolsRequest()
                 
-                # Try to call the handler if it exists
-                handler = handlers.get("tools/list")
+                # Call the handler
+                handler = mcp_server_module._handle_list_tools_fn
                 if handler and callable(handler):
                     result = await handler(list_request)
                     return JSONResponse({
@@ -115,27 +108,11 @@ async def mcp_endpoint(request: Request):
                         "result": result.model_dump() if hasattr(result, "model_dump") else result
                     })
                 else:
-                    # Handler not directly accessible - return default response
-                    logger.warning("Handler not directly accessible, returning default tools list")
                     return JSONResponse({
                         "jsonrpc": "2.0",
                         "id": request_id,
-                        "result": {
-                            "tools": [
-                                {
-                                    "name": "ask_knowledge_base",
-                                    "description": "Query the company's internal knowledge base",
-                                    "inputSchema": {
-                                        "type": "object",
-                                        "properties": {
-                                            "question": {"type": "string"}
-                                        },
-                                        "required": ["question"]
-                                    }
-                                }
-                            ]
-                        }
-                    })
+                        "error": {"code": -32601, "message": "tools/list handler not available"}
+                    }, status_code=500)
             except Exception as e:
                 logger.error(f"Error in tools/list: {e}", exc_info=True)
                 return JSONResponse({
@@ -149,7 +126,8 @@ async def mcp_endpoint(request: Request):
                 from mcp import types
                 call_request = types.CallToolRequest(**params)
                 
-                handler = handlers.get("tools/call")
+                # Call the handler
+                handler = mcp_server_module._handle_call_tool_fn
                 if handler and callable(handler):
                     result = await handler(call_request)
                     return JSONResponse({
