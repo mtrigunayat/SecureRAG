@@ -34,7 +34,14 @@ class QdrantService:
     def __init__(self):
         """Initialize Qdrant client."""
         try:
-            self.client = QdrantClient(url=settings.qdrant_url)
+            # Support both local Qdrant and Qdrant Cloud
+            # Local: url="http://localhost:6333", api_key=""
+            # Cloud: url="https://...", api_key="xxxxxxxx-xxxx-xxxx..."
+            kwargs = {"url": settings.qdrant_url}
+            if settings.qdrant_api_key:
+                kwargs["api_key"] = settings.qdrant_api_key
+            
+            self.client = QdrantClient(**kwargs)
             logger.info(f"Qdrant client initialized: {settings.qdrant_url}")
         except Exception as e:
             logger.error(f"Failed to initialize Qdrant client: {e}")

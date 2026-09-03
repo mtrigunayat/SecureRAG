@@ -13,15 +13,19 @@ class Settings(BaseSettings):
     # Application
     app_env: str = "development"
     app_host: str = "0.0.0.0"
-    app_port: int = 8000
+    app_port: int = 8000  # Overridden by PORT environment variable if set
     log_level: str = "INFO"
     
     # Database
     database_url: str
     
-    # Vector Database
+    # Vector Database (Qdrant)
     qdrant_url: str = "http://localhost:6333"
+    qdrant_api_key: str = ""  # Empty for local Qdrant, required for Qdrant Cloud
     qdrant_collection_name: str = "knowledge_chunks"
+    
+    # CORS (Production must be restricted)
+    cors_origins: str = "http://localhost:3000,http://localhost:5173"  # Comma-separated
     
     # Embeddings (Phase 7 - Local)
     embedding_provider: str = "local"  # local, openai (future), azure (future)
@@ -62,6 +66,13 @@ class Settings(BaseSettings):
         case_sensitive=False,
         extra="ignore"
     )
+
+    def __init__(self, **data):
+        super().__init__(**data)
+        # Override port from PORT environment variable if set (Render compatibility)
+        import os
+        if "PORT" in os.environ:
+            self.app_port = int(os.environ["PORT"])
 
 
 # Global settings instance
