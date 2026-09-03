@@ -79,7 +79,8 @@ async def ask_knowledge_base_impl(
         
     except BackendError as e:
         logger.error(f"Tool error: {e}")
-        return f"Error: Backend error occurred"
+        # Return the actual error message for debugging
+        return f"Error: Backend error - {str(e)}"
     except Exception as e:
         logger.error(f"Unexpected tool error: {e}", exc_info=True)
         return "Error: An unexpected error occurred"
