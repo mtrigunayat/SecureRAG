@@ -113,6 +113,40 @@ class QdrantService:
                     f"Collection '{collection_name}' exists with correct config: "
                     f"size={vector_size}, distance={distance}"
                 )
+                
+                # Ensure payload indexes exist on existing collection
+                # (required for Qdrant Cloud, even if collection already exists)
+                try:
+                    self.client.create_payload_index(
+                        collection_name=collection_name,
+                        field_name="department_id",
+                        field_schema="integer"
+                    )
+                    logger.info(
+                        f"Created payload index for 'department_id' "
+                        f"in collection '{collection_name}'"
+                    )
+                except Exception as index_error:
+                    # Index may already exist - this is OK
+                    logger.debug(
+                        f"Payload index for 'department_id' creation result: {index_error}"
+                    )
+                
+                try:
+                    self.client.create_payload_index(
+                        collection_name=collection_name,
+                        field_name="document_id",
+                        field_schema="integer"
+                    )
+                    logger.info(
+                        f"Created payload index for 'document_id' "
+                        f"in collection '{collection_name}'"
+                    )
+                except Exception as index_error:
+                    # Index may already exist - this is OK
+                    logger.debug(
+                        f"Payload index for 'document_id' creation result: {index_error}"
+                    )
             else:
                 # Create collection
                 self.client.create_collection(
