@@ -46,6 +46,10 @@ from mcp_server.oauth import (
     oauth_authorize,
     oauth_token
 )
+from mcp_server.auth.login import (
+    authenticate_user,
+    get_login_html
+)
 
 logger = get_logger(__name__)
 
@@ -111,6 +115,56 @@ async def oauth_token_handler(request: Request):
     return await oauth_token(request)
 
 
+async def login_page_handler(request: Request):
+    """
+    Serve login page for users to authenticate and get MCP tokens.
+    
+    This page allows users to:
+    1. Enter their credentials
+    2. Get authenticated
+    3. Receive an MCP token
+    4. Copy token for Claude MCP configuration
+    """
+    from starlette.responses import HTMLResponse
+    return HTMLResponse(get_login_html())
+
+
+async def login_api_handler(request: Request):
+    """
+    API endpoint for login form to authenticate users.
+    
+    Receives: POST with {username, password}
+    Returns: JSON with {success, message, mcp_token, user_id, username, department}
+    """
+    from starlette.responses import JSONResponse
+    
+    try:
+        data = await request.json()
+        username = data.get("username", "").strip()
+        password = data.get("password", "").strip()
+        
+        if not username or not password:
+            return JSONResponse({
+                "success": False,
+                "message": "Username and password required"
+            }, status_code=400)
+        
+        # Authenticate user
+        result = await authenticate_user(username, password)
+        
+        if result.success:
+            return JSONResponse(result.model_dump(), status_code=200)
+        else:
+            return JSONResponse(result.model_dump(), status_code=401)
+    
+    except Exception as e:
+        logger.error(f"Login API error: {e}", exc_info=True)
+        return JSONResponse({
+            "success": False,
+            "message": "Server error during authentication"
+        }, status_code=500)
+
+
 async def run_mcp_server():
     """
     Run MCP server with Streamable HTTP transport (Starlette + Uvicorn).
@@ -135,6 +189,8 @@ async def run_mcp_server():
     logger.info("=" * 70)
     logger.info("Endpoints:")
     logger.info(f"  Health:        GET /health")
+    logger.info(f"  Login Page:    GET /auth/login")
+    logger.info(f"  Login API:     POST /auth/login-api")
     logger.info(f"  MCP:           POST /mcp")
     logger.info(f"  OAuth Metadata GET /.well-known/oauth-authorization-server")
     logger.info(f"  OAuth Authorize GET /oauth/authorize")
@@ -149,6 +205,10 @@ async def run_mcp_server():
             
             # MCP Streamable HTTP endpoint
             Route("/mcp", mcp_endpoint_handler, methods=["POST"]),
+            
+            # Authentication & Token Management
+            Route("/auth/login", login_page_handler, methods=["GET"]),
+            Route("/auth/login-api", login_api_handler, methods=["POST"]),
             
             # OAuth endpoints
             Route(

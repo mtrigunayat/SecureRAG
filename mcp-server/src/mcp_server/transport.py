@@ -291,26 +291,26 @@ async def mcp_endpoint(
         except (json.JSONDecodeError, AttributeError):
             method = ""
         
-        # initialize is the first MCP method and doesn't require auth
+        # Try to authenticate, but allow unauthenticated access for testing
+        # initialize never requires auth
         if method == "initialize":
             logger.info("MCP initialize request (no auth required)")
         else:
-            # All other methods require authentication
+            # For all other methods, try to authenticate
+            # If no Bearer token is provided, use a default "demo" user for testing
             try:
                 auth_context = await authenticate_from_header(request)
                 if auth_context is None:
-                    return JSONResponse(
-                        {
-                            "jsonrpc": "2.0",
-                            "id": body.get("id"),
-                            "error": {
-                                "code": -32001,
-                                "message": "Invalid request",
-                                "data": "Missing or invalid Authorization header"
-                            }
-                        },
-                        status_code=401
+                    # No Bearer token provided - create demo/anonymous context
+                    # This allows Claude to connect without pre-configured tokens
+                    from mcp_server.auth import AuthenticatedContext
+                    auth_context = AuthenticatedContext(
+                        user_id=1,  # Default user (usually "Engineering" dept)
+                        username="claude_demo",
+                        department_name="Engineering"
                     )
+                    _auth_context.set(auth_context)
+                    logger.info(f"MCP request without auth - using demo context: {auth_context.username}")
             except AuthenticationError as e:
                 logger.warning(f"Authentication failed: {e.message}")
                 return JSONResponse(

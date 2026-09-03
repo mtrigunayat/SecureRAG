@@ -33,6 +33,10 @@ class Settings(BaseSettings):
     # Backend
     backend_url: str = "http://localhost:8000"  # Must be set to deployed backend URL in production
     backend_api_timeout: int = 30
+    backend_timeout: int = 30  # Alias for backend_api_timeout
+    
+    # Internal Service Key (for token generation)
+    internal_service_key: Optional[str] = None
     
     # Logging
     log_level: str = "INFO"

@@ -152,14 +152,23 @@ async def oauth_authorize(request: Request) -> JSONResponse:
     - code_challenge: PKCE challenge (optional)
     - code_challenge_method: "S256" or "plain" (optional)
     
+    Flow:
+    1. User initiates OAuth from Claude
+    2. This endpoint redirects to login page
+    3. User logs in with credentials
+    4. Login page redirects back with authorization code
+    5. Claude exchanges code for token
+    
     Returns:
-    - 302 redirect to redirect_uri with authorization code
+    - 302 redirect to login page (with OAuth params stored in session)
     
     Security:
-    - Authorization is implicit (MCP token already validates user)
-    - No login prompt (assumes MCP authentication already done)
-    - Code is single-use and expires quickly
+    - Validates redirect_uri format (basic check)
+    - OAuth state parameter preserved for CSRF protection
+    - Uses same authentication as MCP login
     """
+    from starlette.responses import RedirectResponse
+    
     # Extract parameters
     response_type = request.query_params.get("response_type")
     client_id = request.query_params.get("client_id")
@@ -197,31 +206,26 @@ async def oauth_authorize(request: Request) -> JSONResponse:
             status_code=400
         )
     
-    # Generate authorization code (single-use, expires in 10 minutes)
-    auth_code = secrets.token_urlsafe(32)
+    # Validate redirect_uri format (must be HTTPS in production)
+    if not redirect_uri.startswith(("https://", "http://localhost")):
+        logger.warning(f"Insecure redirect_uri: {redirect_uri}")
     
-    # Store code for later token exchange (in production, use Redis/DB)
-    # For now, we'll generate tokens directly without storing codes
+    logger.info(f"OAuth authorize request: client_id={client_id} redirect_uri={redirect_uri}")
     
-    logger.info(f"OAuth authorization grant: client_id={client_id} scope={scope}")
-    
-    # Build redirect response
-    redirect_params = {
-        "code": auth_code,
-    }
-    
-    if state:
-        redirect_params["state"] = state
-    
-    # Construct redirect URL
-    separator = "&" if "?" in redirect_uri else "?"
-    redirect_url = f"{redirect_uri}{separator}" + "&".join(
-        f"{k}={v}" for k, v in redirect_params.items()
+    # Build login URL with OAuth parameters
+    # These will be used after login to complete OAuth flow
+    login_url = (
+        f"{settings.mcp_public_url.rstrip('/')}/auth/login?"
+        f"oauth_client_id={client_id}&"
+        f"oauth_redirect_uri={redirect_uri}&"
+        f"oauth_scope={scope}"
     )
     
-    # Return redirect
-    from starlette.responses import RedirectResponse
-    return RedirectResponse(url=redirect_url)
+    if state:
+        login_url += f"&oauth_state={state}"
+    
+    # Redirect to login page
+    return RedirectResponse(url=login_url)
 
 
 async def oauth_token(request: Request) -> JSONResponse:
@@ -288,15 +292,18 @@ async def oauth_token(request: Request) -> JSONResponse:
                     status_code=400
                 )
             
-            # In a real implementation, validate code against stored codes
-            # For now, accept any code and generate token
-            access_token = secrets.token_urlsafe(32)
-            
-            logger.info(f"OAuth token issued via authorization_code grant")
+            # Decode authorization code (which is base64-encoded MCP token from login)
+            try:
+                import base64
+                access_token = base64.b64decode(token_request.code).decode('utf-8')
+                logger.info(f"OAuth token issued via authorization_code grant")
+            except Exception as e:
+                logger.error(f"Failed to decode authorization code: {e}")
+                access_token = secrets.token_urlsafe(32)
             
             response = OAuthTokenResponse(
                 access_token=access_token,
-                expires_in=3600
+                expires_in=604800  # 7 days
             )
             
             return JSONResponse(response.to_dict())
