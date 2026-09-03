@@ -124,7 +124,11 @@ async def mcp_endpoint(request: Request):
         elif method == "tools/call":
             try:
                 from mcp import types
-                call_request = types.CallToolRequest(**params)
+                # Create CallToolRequest with name and arguments from params
+                call_request = types.CallToolRequest(
+                    name=params.get("name"),
+                    arguments=params.get("arguments", {})
+                )
                 
                 # Call the handler
                 handler = mcp_server_module._handle_call_tool_fn
