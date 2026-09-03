@@ -42,7 +42,14 @@ def get_db() -> Generator[Session, None, None]:
         def get_users(db: Session = Depends(get_db)):
             return db.query(User).all()
     """
-    from app.core.errors import AuthenticationError, AuthorizationError, DatabaseError
+    from app.core.errors import (
+        AuthenticationError, 
+        AuthorizationError, 
+        DatabaseError,
+        VectorDBError,
+        EmbeddingError,
+        LLMError
+    )
     from fastapi.exceptions import RequestValidationError
     from pydantic import ValidationError
     
@@ -50,8 +57,17 @@ def get_db() -> Generator[Session, None, None]:
     try:
         yield db
         db.commit()
-    except (AuthenticationError, AuthorizationError, RequestValidationError, ValidationError):
-        # Re-raise authentication, authorization, and validation errors without converting to 503
+    except (
+        AuthenticationError, 
+        AuthorizationError,
+        VectorDBError,
+        EmbeddingError,
+        LLMError,
+        RequestValidationError, 
+        ValidationError
+    ):
+        # Re-raise service-level and auth errors without converting
+        # These should propagate with their proper HTTP status codes
         db.rollback()
         raise
     except Exception as e:
