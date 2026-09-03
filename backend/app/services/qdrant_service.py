@@ -323,9 +323,10 @@ class QdrantService:
         NOT after retrieving results.
         
         Process:
-            1. Qdrant searches for similar vectors
-            2. AND applies department_filter DURING search
-            3. Returns only authorized results
+            1. Ensure collection exists (with indexes for Qdrant Cloud)
+            2. Qdrant searches for similar vectors
+            3. AND applies department_filter DURING search
+            4. Returns only authorized results
         
         Args:
             collection_name: Name of the collection to search
@@ -356,11 +357,20 @@ class QdrantService:
             VectorDBError: If search fails
             
         Security:
+            - Collection must exist with proper indexes
             - ACL filter is mandatory and applied during search
             - Client cannot bypass department restriction
             - Unauthorized chunks are NEVER retrieved
         """
         try:
+            # Ensure collection exists with proper indexes (idempotent)
+            # This is necessary for Qdrant Cloud which was deleted during debugging
+            self.ensure_collection(
+                collection_name=collection_name,
+                vector_size=384,  # all-MiniLM-L6-v2 dimension
+                distance=Distance.COSINE
+            )
+            
             # Search with ACL filter using query_points
             search_result = self.client.query_points(
                 collection_name=collection_name,
