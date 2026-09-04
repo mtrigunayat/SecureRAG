@@ -68,31 +68,104 @@ CLAUDE CALLS MCP TOOL:
 MCP SERVER RECEIVES REQUEST:
 Validates that you are a real user
         ↓
-MCP SERVER GETS AUTHORIZATION:
+MCP SERVER GETS AUTHORIZATION FROM BACKEND:
 Asks backend "Is this user real? What department?"
         ↓
-BACKEND RESPONDS:
-"Yes, this is Alice from Engineering dept"
+BACKEND RESPONDS WITH JWT:
+"Yes, this is Alice from Engineering dept. Here's JWT."
         ↓
-MCP SERVER QUERIES KNOWLEDGE BASE:
-"Search for 'deployment' documents in Qdrant"
+MCP SERVER DELEGATES TO BACKEND:
+Sends question + JWT to backend /api/chat endpoint
+(MCP doesn't query Qdrant directly!)
         ↓
-QDRANT RETURNS DOCUMENTS:
-"Here are 5 matching deployment docs"
+BACKEND QUERIES QDRANT:
+"Search for 'deployment' documents"
         ↓
-MCP SERVER FILTERS BY ACL:
+BACKEND FILTERS BY ACL:
 "Remove HR docs - Alice can only see Engineering docs"
         ↓
-MCP SERVER FORMATS RESPONSE:
-"Deployment involves 3 stages... Sources: Engineering Guide (p1-5)"
+BACKEND RETURNS ANSWER + SOURCES:
+"Deployment involves 3 stages... Sources: [docs]"
+        ↓
+MCP SERVER FORMATS FOR CLAUDE:
+Converts backend response to Claude-friendly format
         ↓
 CLAUDE RECEIVES RESPONSE:
 Shows answer to user with sources cited
 ```
 
+**⚠️ IMPORTANT: MCP Server is a PROXY, not a processor!**
+- ❌ MCP server does NOT query Qdrant
+- ❌ MCP server does NOT filter by ACL
+- ❌ MCP server does NOT have database access
+- ✅ MCP server ONLY validates tokens and delegates to backend
+
 ---
 
-## 🔄 End-to-End Flow with Real Examples
+## � KEY INSIGHT: MCP Server is a Proxy, Not a Processor
+
+### What MCP Server Actually Does:
+```
+Claude → [MCP Server validates token] → [Delegates to Backend] → Backend → Qdrant
+```
+
+### What MCP Server Does NOT Do:
+| Task | Who Really Does It | Why |
+|------|------------------|-----|
+| Query Qdrant | Backend only | MCP has no database/Qdrant access |
+| Filter by ACL | Backend only | Backend owns the security rules |
+| Generate answer | Backend only | MCP is not an LLM |
+| Access documents | Backend only | Documents stored in backend |
+| Validate JWT | Backend only | MCP just passes it through |
+
+### Why is MCP Designed This Way?
+
+**Security:**
+- If Qdrant credentials leaked on MCP, only Qdrant is compromised
+- Backend stays secure and controls all ACLs
+- Separation of concerns = smaller attack surface
+
+**Simplicity:**
+- MCP only needs to know: tokens + HTTP
+- MCP doesn't need: database knowledge, Qdrant API, ACL rules
+- Easy to scale: multiple MCP servers → same backend
+
+**Flexibility:**
+- Can change Qdrant without touching MCP
+- Can change ACL rules without deploying MCP
+- Can swap backends without MCP knowing
+
+### Real File Architecture
+
+```
+┌─────────────────────────────────────────┐
+│ MCP SERVER (mcp-server/)                │
+│ ├─ Token validation only                │
+│ │  └─ File: auth/token_service.py      │
+│ ├─ HTTP client to backend               │
+│ │  └─ File: client/backend_api_client.py │
+│ ├─ Response formatting                  │
+│ │  └─ File: tools/ask_tool.py           │
+│ └─ NO database code                     │
+│    NO Qdrant code                       │
+│    NO ACL filtering code                │
+└─────────────────────────────────────────┘
+                  ↓ (HTTP calls to)
+┌─────────────────────────────────────────┐
+│ BACKEND (backend/app/)                  │
+│ ├─ Token endpoint                       │
+│ │  └─ File: api/mcp_internal.py         │
+│ ├─ Chat endpoint (searches + filters)   │
+│ │  └─ File: api/chat.py                 │
+│ ├─ Qdrant queries                       │
+│ │  └─ File: services/qdrant_service.py  │
+│ ├─ ACL filtering                        │
+│ │  └─ File: services/retrieval_service.py │
+│ └─ All security logic here              │
+└─────────────────────────────────────────┘
+```
+
+---
 
 ### SCENARIO: User Alice (Engineering) asks "What is the deployment process?"
 
@@ -248,7 +321,27 @@ Response Body:
 
 ### 🔵 PHASE 5: MCP Server Queries the Knowledge Base
 
-**Now MCP has authorization. Time to ask for documents!**
+**WAIT - MCP Server Does NOT Query Qdrant Directly!**
+
+MCP sends the question + JWT to the backend. The backend does ALL the real work:
+
+**MCP Server's Job:**
+```
+1. Have JWT from Phase 4
+2. Send question to backend endpoint
+3. Wait for response
+4. Pass response to Claude
+```
+
+**Backend's Job (the real work):**
+```
+1. Receive question + JWT
+2. Validate JWT
+3. Extract user_id, department from JWT
+4. Search Qdrant for matching documents
+5. Apply ACL filters (remove docs user can't see)
+6. Format and return results
+```
 
 ```json
 POST http://localhost:8000/api/chat
@@ -444,19 +537,26 @@ Process: POST to backend /api/internal/mcp/validate
 Output: JWT token + user info
 Time: ~50ms (network round trip)
 Handled By: [backend/app/api/mcp_internal.py]
+
+⚠️ This is where MCP gets the JWT to use in next step
 ```
 
-### Step 6: Backend Searches Knowledge Base
+### Step 6: MCP Delegates to Backend (MCP does NOT query Qdrant!)
 ```
-Input: Question + user department
-Process: 
-  1. Search Qdrant for semantic matches
-  2. Filter results by ACL
-  3. Format results
-Output: Document list with content + sources
-Time: ~200-500ms (depends on Qdrant latency)
-Handled By: [backend/app/services/retrieval_service.py]
-  → Calls [backend/app/services/qdrant_service.py]
+Input: Question + JWT
+Process: POST to backend /api/chat
+         Backend searches Qdrant
+         Backend filters by ACL
+         Backend returns answer + sources
+Output: Answer + source documents
+Time: ~200-500ms (mainly waiting for Qdrant)
+Handled By: 
+  - MCP: [mcp-server/src/mcp_server/client/backend_api_client.py]
+  - Backend: [backend/app/services/retrieval_service.py]
+  - Qdrant: [backend/app/services/qdrant_service.py]
+
+✅ MCP ONLY sends the HTTP request
+✅ Backend does ALL the real work
 ```
 
 ### Step 7: MCP Formats Response
@@ -865,6 +965,8 @@ Documents are tagged with department.
 
 ## 🚀 Complete Flow Diagram
 
+**Key: MCP is a PROXY (thin layer), Backend does the real work**
+
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │ CLAUDE (in Claude app)                                           │
@@ -882,18 +984,24 @@ Documents are tagged with department.
                            │ HTTP POST to mcp.secure-rag.com
                            ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│ MCP SERVER (our backend)                                         │
+│ MCP SERVER (THIN PROXY LAYER)                                    │
 │ File: main.py, tools/ask_tool.py                                │
 │ ├─ Receives JSON-RPC request                                     │
 │ ├─ Extracts MCP token from Authorization header                 │
 │ ├─ Validates token → Gets user_id, department                   │
 │ └─ Creates AuthenticatedContext                                 │
+│                                                                  │
+│ ⚠️ MCP DOES NOT HAVE:                                             │
+│    - Qdrant access                                               │
+│    - ACL filtering logic                                         │
+│    - Document database                                           │
+│    - Answer generation                                           │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            │ Call backend validate endpoint
                            ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│ BACKEND (FastAPI at localhost:8000)                              │
+│ BACKEND (WORKER LAYER)                                           │
 │ File: app/api/mcp_internal.py                                    │
 │ ├─ POST /api/internal/mcp/validate                              │
 │ ├─ Lookup MCP token in database                                 │
@@ -901,26 +1009,32 @@ Documents are tagged with department.
 │ └─ Return {user_id, dept, JWT}                                  │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
+                           │ MCP now has JWT token
                            │ Send question with JWT
                            ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│ BACKEND - CHAT ENDPOINT                                          │
+│ BACKEND - CHAT ENDPOINT (WHERE REAL WORK HAPPENS)                │
 │ File: app/api/chat.py                                            │
 │ ├─ Receive question + JWT                                        │
 │ ├─ Validate JWT → Extract user_id, department                   │
 │ ├─ Call retrieval_service.retrieve_relevant_documents()         │
-│ └─ Apply ACL filtering                                           │
+│ └─ Apply ACL filtering (removes docs user can't see)            │
+│                                                                  │
+│ 🔍 THIS IS WHERE THE SEARCH & FILTERING HAPPENS                  │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            │ Search for documents
                            ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│ QDRANT CLOUD (Vector Database)                                   │
-│ File: app/services/qdrant_service.py                             │
+│ QDRANT CLOUD (Vector Database - Outside our control)             │
+│ File: app/services/qdrant_service.py (handles communication)    │
 │ ├─ Convert question to embedding                                 │
 │ ├─ Search for similar document embeddings                        │
 │ ├─ Return top 5 matches with scores                              │
 │ └─ Apply final ACL check                                         │
+│                                                                  │
+│ ⚠️ MCP SERVER NEVER TALKS TO QDRANT DIRECTLY!                     │
+│    Only backend communicates with Qdrant                        │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            │ Documents + metadata
@@ -935,11 +1049,13 @@ Documents are tagged with department.
                            │ JSON response with answer
                            ↓
 ┌──────────────────────────────────────────────────────────────────┐
-│ MCP SERVER - RESPONSE FORMATTING                                 │
+│ MCP SERVER - RESPONSE FORMATTING (FINAL STEP)                    │
 │ File: tools/ask_tool.py → _format_response()                     │
 │ ├─ Convert to MCP response format                                │
 │ ├─ Include citations                                             │
 │ └─ Return to Claude                                              │
+│                                                                  │
+│ ✅ MCP ONLY FORMATS - it doesn't generate the answer              │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            │ JSON-RPC response
@@ -955,6 +1071,12 @@ Documents are tagged with department.
 │          [Cited from Engineering Deployment Guide p.1-5]"       │
 └──────────────────────────────────────────────────────────────────┘
 ```
+
+**Summary:**
+- **MCP Server**: Validates token, delegates to backend, formats response
+- **Backend**: Does ALL real work (search, filter, generate answer)
+- **Qdrant**: Stores & searches embeddings (only backend talks to it)
+
 
 ---
 
