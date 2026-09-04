@@ -30,35 +30,35 @@ export function HomePage() {
           <h1 className="hero-title">Secure RAG Assistant</h1>
           
           <p className="hero-subtitle">
-            Enterprise-grade Retrieval Augmented Generation with department-level access control
+            Enterprise-grade AI with department-level security. Now integrated with Claude via Model Context Protocol.
           </p>
 
           <div className="cta-buttons">
             <Link to="/login" className="btn btn-primary">
-              Get Started
+              Start Now
             </Link>
             <a href="#features" className="btn btn-secondary">
-              Learn More
+              See Features
             </a>
           </div>
 
           {/* Stats Section */}
           <div className="stats-grid">
             <div className="stat-item">
-              <div className="stat-number">🔒</div>
-              <div className="stat-label">Department-Level Security</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">⚡</div>
-              <div className="stat-label">Real-time Responses</div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-number">📊</div>
-              <div className="stat-label">Source Attribution</div>
+              <div className="stat-number">�</div>
+              <div className="stat-label">Department Security</div>
             </div>
             <div className="stat-item">
               <div className="stat-number">🤖</div>
-              <div className="stat-label">AI-Powered Search</div>
+              <div className="stat-label">Claude MCP Ready</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">⚡</div>
+              <div className="stat-label">Real-time RAG</div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-number">✨</div>
+              <div className="stat-label">AI Powered</div>
             </div>
           </div>
         </section>
@@ -112,7 +112,7 @@ export function HomePage() {
               <div className="feature-icon">📊</div>
               <h3>Source Attribution</h3>
               <p>
-                Every answer includes source documents with similarity scores for full traceability.
+                Every answer includes source documents and similarity scores for full traceability and trust.
               </p>
             </div>
           </div>
@@ -120,14 +120,14 @@ export function HomePage() {
 
         {/* How It Works Section */}
         <section className="how-it-works-section">
-          <h2 className="section-title">How It Works</h2>
+          <h2 className="section-title">Quick Start</h2>
           
           <div className="steps-container">
             <div className="step-item">
               <div className="step-number">1</div>
               <div className="step-content">
-                <h3>Login Securely</h3>
-                <p>Authenticate with your credentials and get assigned to your department.</p>
+                <h3>Login to Your Department</h3>
+                <p>Sign in securely and get connected to your department's knowledge base.</p>
               </div>
             </div>
 
@@ -136,8 +136,8 @@ export function HomePage() {
             <div className="step-item">
               <div className="step-number">2</div>
               <div className="step-content">
-                <h3>Ask Questions</h3>
-                <p>Type your question in natural language about company policies and procedures.</p>
+                <h3>Ask AI Anything</h3>
+                <p>Chat with SecureRAG directly here, or use Claude with MCP for AI-powered assistance.</p>
               </div>
             </div>
 
@@ -146,18 +146,8 @@ export function HomePage() {
             <div className="step-item">
               <div className="step-number">3</div>
               <div className="step-content">
-                <h3>Get Answers</h3>
-                <p>Receive AI-powered answers based only on documents you're authorized to access.</p>
-              </div>
-            </div>
-
-            <div className="step-connector">→</div>
-
-            <div className="step-item">
-              <div className="step-number">4</div>
-              <div className="step-content">
-                <h3>Verify Sources</h3>
-                <p>Review source documents and relevance scores for full transparency.</p>
+                <h3>Get Secure Answers</h3>
+                <p>Receive answers with full source attribution, only from your department's documents.</p>
               </div>
             </div>
           </div>
@@ -199,12 +189,12 @@ export function HomePage() {
             </div>
 
             <div className="tech-group">
-              <h3>Security</h3>
+              <h3>AI Integration</h3>
               <ul>
-                <li>JWT Tokens</li>
-                <li>bcrypt Hashing</li>
-                <li>CORS Protection</li>
-                <li>RBAC Authorization</li>
+                <li>Model Context Protocol (MCP)</li>
+                <li>Claude AI Integration</li>
+                <li>Azure OpenAI</li>
+                <li>Service-to-Service Auth</li>
               </ul>
             </div>
           </div>

@@ -400,6 +400,17 @@
   padding: 0 2rem 2rem;
 }
 
+/* Make feature cards responsive and primary cards full width on mobile */
+@media (min-width: 768px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .feature-card-primary {
+    grid-column: span 1;
+  }
+}
+
 .feature-card {
   padding: 2rem;
   background: white;
