@@ -23,6 +23,7 @@ class Settings(BaseSettings):
     qdrant_url: str = "http://localhost:6333"
     qdrant_api_key: str = ""  # Empty for local Qdrant, required for Qdrant Cloud
     qdrant_collection_name: str = "knowledge_chunks"
+    qdrant_timeout: int = 30  # Timeout for Qdrant operations (seconds)
     
     # CORS (Production must be restricted)
     cors_origins: str = "http://localhost:3000,http://localhost:5173"  # Comma-separated

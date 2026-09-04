@@ -2,6 +2,7 @@
 Qdrant vector database service
 """
 from typing import List, Optional, Dict, Any
+import socket
 from qdrant_client import QdrantClient
 from qdrant_client.http.exceptions import ResponseHandlingException, UnexpectedResponse
 from qdrant_client.models import (
@@ -37,12 +38,15 @@ class QdrantService:
             # Support both local Qdrant and Qdrant Cloud
             # Local: url="http://localhost:6333", api_key=""
             # Cloud: url="https://...", api_key="xxxxxxxx-xxxx-xxxx..."
-            kwargs = {"url": settings.qdrant_url}
+            kwargs = {
+                "url": settings.qdrant_url,
+                "timeout": settings.qdrant_timeout
+            }
             if settings.qdrant_api_key:
                 kwargs["api_key"] = settings.qdrant_api_key
             
             self.client = QdrantClient(**kwargs)
-            logger.info(f"Qdrant client initialized: {settings.qdrant_url}")
+            logger.info(f"Qdrant client initialized: {settings.qdrant_url} (timeout={settings.qdrant_timeout}s)")
         except Exception as e:
             logger.error(f"Failed to initialize Qdrant client: {e}")
             raise VectorDBError(f"Failed to initialize Qdrant client: {e}")
@@ -58,6 +62,9 @@ class QdrantService:
             # Try to get collections (basic connectivity test)
             self.client.get_collections()
             return True
+        except (socket.timeout, TimeoutError):
+            logger.error(f"Qdrant health check timed out after {settings.qdrant_timeout}s")
+            return False
         except ResponseHandlingException as e:
             logger.error(f"Qdrant health check failed: {e}")
             return False
@@ -198,6 +205,9 @@ class QdrantService:
                 
         except VectorDBError:
             raise
+        except (socket.timeout, TimeoutError) as e:
+            logger.error(f"Qdrant operation timed out while ensuring collection '{collection_name}': {e}")
+            raise VectorDBError(f"Qdrant operation timed out: {e}")
         except Exception as e:
             logger.error(f"Failed to ensure collection '{collection_name}': {e}")
             raise VectorDBError(
@@ -397,6 +407,9 @@ class QdrantService:
             
             return results
             
+        except (socket.timeout, TimeoutError) as e:
+            logger.error(f"Qdrant request timed out after {settings.qdrant_timeout}s: {e}")
+            raise VectorDBError(f"Qdrant request timed out: {e}")
         except Exception as e:
             logger.error(f"Vector search failed: {e}")
             raise VectorDBError(f"Vector search failed: {e}")
